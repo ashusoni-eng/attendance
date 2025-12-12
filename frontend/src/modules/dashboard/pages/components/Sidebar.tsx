@@ -2,8 +2,12 @@ import { Link } from "react-router-dom";
 import {  LogOut, Home, Calendar, Camera, ChevronRight } from "lucide-react";
 import { useAuth } from "../../../../providers/AuthProvider";
 
+
 export default function Sidebar() {
   const { logout } = useAuth();
+
+
+  
 
   return (
     <div className="h-screen w-64 bg-teal-700 text-white flex flex-col justify-between fixed left-0 top-0">
@@ -33,8 +37,17 @@ export default function Sidebar() {
           >
             <Calendar size={20} /> Leaves
           </Link>
-        </nav>
-      </div>
+       
+    
+      <Link
+             to="/check-in"
+            className="flex items-center gap-3 hover:text-gray-200"
+          >
+            <Camera size={20} />  Mark-Attendance
+          </Link>
+           </nav>
+        </div>
+      
 
       {/* FOOTER PROFILE + LOGOUT */}
       <div className="p-5 border-t border-white/20">

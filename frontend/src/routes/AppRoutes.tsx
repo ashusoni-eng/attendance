@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import RegisterPage from "../modules/auth/pages/RegisterPage";
 import DashboardPage from "../modules/dashboard/pages/DashboardPage";
+   import CheckInPage from "../modules/attendance/pages/CheckInPage";
 
 // (Optional) When you create these, just uncomment:
 // import DashboardPage from "../../modules/dashboard/pages/DashboardPage";
@@ -24,6 +25,10 @@ export default function AppRoutes() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
+    
+
+<Route path="/check-in" element={<CheckInPage />} />
+
 
 
       {/* PROTECTED USER ROUTES (uncomment when you add them) */}
