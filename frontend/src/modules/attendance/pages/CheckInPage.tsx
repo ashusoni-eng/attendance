@@ -98,13 +98,7 @@ export default function CheckInPage() {
           <div>
             <h3 className="font-medium mb-3">Location</h3>
             <GPSStatus onLocation={handleLocation} />
-            {coords && (
-              <div className="mt-3 text-sm text-gray-700">
-                <div>Lat: {coords.latitude.toFixed(6)}</div>
-                <div>Lng: {coords.longitude.toFixed(6)}</div>
-                <div>Accuracy: {Math.round(coords.accuracy ?? 0)} m</div>
-              </div>
-            )}
+        
           </div>
 
           <div className="mt-6">

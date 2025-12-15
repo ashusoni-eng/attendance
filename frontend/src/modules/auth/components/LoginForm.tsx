@@ -1,5 +1,3 @@
-// src/components/LoginForm.tsx
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -39,27 +37,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
     try {
       const response = await authApi.login(data);
-      const token = response.data.token;
 
-      login(token);
+      // Extract token & user from NestJS backend
+      const accessToken = response.data.accessToken;
+      const refreshToken = response.data.refreshToken;
+      const user = response.data.user;
+
+      // Update AuthContext
+      login(accessToken, refreshToken, user);
 
       // SUCCESS POPUP
       await Swal.fire({
         icon: "success",
         title: "Login Successful!",
         text: "Welcome back 👋",
-        confirmButtonColor: "#0d9488", // teal
-        timer: 1500,
+        // confirmButtonColor: "#0d9488",
+        timer: 1000,
       });
 
-      onSuccess(); // navigate
+      onSuccess(); 
     } catch (error: any) {
       const message =
         error?.response?.data?.message || "Invalid credentials. Please try again.";
 
       setApiError(message);
 
-      // ERROR POPUP
       Swal.fire({
         icon: "error",
         title: "Login Failed",
@@ -79,7 +81,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       <div className="mt-8">
         <div className="mt-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            
+
             {/* API Error */}
             {apiError && (
               <div className="p-3 text-sm text-red-700 bg-red-100 rounded-md">
@@ -158,7 +160,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         </div>
       </div>
 
-      {/* Register Link */}
       <p className="mt-8 text-center text-sm text-gray-600">
         Don't have an account?{" "}
         <a href="/Register" className="font-medium text-teal-600 hover:text-teal-500">
