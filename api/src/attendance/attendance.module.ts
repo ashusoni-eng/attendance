@@ -8,5 +8,6 @@ import { BlacklistModule } from 'src/blacklist/blacklist.module';
   imports:[AuthModule,BlacklistModule],
   controllers: [AttendanceController],
   providers: [AttendanceService],
+  exports:[AttendanceService]
 })
 export class AttendanceModule {}

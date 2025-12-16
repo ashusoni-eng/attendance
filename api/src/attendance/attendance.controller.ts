@@ -8,31 +8,37 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 @Controller('attendance')
 @UseGuards(JwtAuthGuard)
 export class AttendanceController {
-  constructor(private readonly attendanceService: AttendanceService) {}
+  constructor(private readonly attendanceService: AttendanceService) { }
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   create(
     @UploadedFile() imageFile: Express.Multer.File,
     @Body() createAttendanceDto: CreateAttendanceDto,
-    ) {
-    return this.attendanceService.create(createAttendanceDto,imageFile);
+  ) {
+    // --add image parameter error not capture
+    return this.attendanceService.create(createAttendanceDto, imageFile);
   }
 
   @Get()
   findAll(
-    @Query("page") page:number=1,
-    @Query("perpage") perpage:number=10,
-    @Query("from") from?:string,
-    @Query("to") to?:string,
-    @Query("q") query?:string|undefined,
+    @Query("page") page: number = 1,
+    @Query("perpage") perPage: number = 10,
+    @Query("from") from?: string,
+    @Query("to") to?: string,
+    @Query("q") query?: string | undefined,
   ) {
-    return this.attendanceService.findAll(page,perpage,query,from,to);
+    return this.attendanceService.findAll(page, perPage, query, from, to);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.attendanceService.findOne(id);
+  findOne(@Param('id') id: string,
+    @Query("page") page: number = 1,
+    @Query("perpage") perPage: number = 30,
+    @Query("from") from?: string,
+    @Query("to") to?: string,
+  ) {
+    return this.attendanceService.findOne(id, page, perPage, from, to);
   }
 
   @Patch(':id')
