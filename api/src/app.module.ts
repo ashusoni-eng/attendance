@@ -30,6 +30,9 @@ import { FacebookStrategy } from "./auth/facebook.strategy";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { AttendanceModule } from './attendance/attendance.module';
+import { AdminModule } from './users/admin/admin.module';
+import { EmployeeModule } from './users/employee/employee.module';
+import { LeaveEntitlementsModule } from "./leaves/leave-entitlements/leave-entitlements.module";
 
 @Module({
   imports: [
@@ -49,6 +52,10 @@ import { AttendanceModule } from './attendance/attendance.module';
     PrismaModule,
     BlacklistModule,
     AttendanceModule,
+    AdminModule,
+    EmployeeModule,
+    LeaveEntitlementsModule
+    
   ],
   controllers: [AppController],
   providers: [

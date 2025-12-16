@@ -32,6 +32,18 @@ enum Gender {
   OTHER
 }
 
+enum Status{
+  PRESENT
+  LATE
+  ABSENT
+  OUTSIDE_OFFICE
+}
+enum RequestStatus{
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   fullName        String
@@ -49,6 +61,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   attendence      Attendence[]  
+  leave_entitlements  Leave_entitlements[]
+  leave_requests  Leave_requests[]
 }
 
 model Attendence{
@@ -58,6 +72,35 @@ model Attendence{
   userId          String
   createdAt       DateTime @default(now())
   user            User @relation(fields:[userId],references:[id] )
+  status          Status
+}
 
+model LeaveType{
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  type    String
+  description String?
+  max_consecutive_days Int?
+  createdAt DateTime @default(now())
+  leave_entitlements Leave_entitlements[]
+}
+
+model Leave_entitlements{
+  id  String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String
+  leave_type_id String
+  total_leaves Int
+  used_leaves Int?
+  remaining_leaves Int?
+  user User @relation(fields:[userId],references:[id])
+  leaveType LeaveType @relation(fields:[leave_type_id],references:[id])
+  createdAt DateTime @default(now())
+}
+
+model Leave_requests{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String
+  request_status RequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  user User @relation(fields:[userId],references:[id])
 }
 
