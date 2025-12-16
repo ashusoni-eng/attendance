@@ -1,46 +1,90 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { profileApi } from "../modules/user/api/user.api";
+
+interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  accountType?: string;
+}
 
 interface AuthContextType {
-  token: string | null;
+  user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  login: (token: string, refreshToken: string, user: User) => void;
   logout: () => void;
+  loadUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used inside AuthProvider");
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 };
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
+  const [accessToken, setAccessToken] = useState<string | null>(
+    localStorage.getItem("accessToken")
   );
 
-  const isAuthenticated = !!token;
+  const [user, setUser] = useState<User | null>(null);
 
-  const login = (token: string) => {
-    localStorage.setItem("token", token);
-    setToken(token);
+  const isAuthenticated = !!accessToken;
+
+  // Called after successful login
+  const login = (token: string, refreshToken: string, user: User) => {
+    localStorage.setItem("accessToken", token);
+    localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    setAccessToken(token);
+    setUser(user);
   };
+  useEffect(() => {
+  console.log("AUTH USER 👉", user);
+}, [user]);
+
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+
+    setAccessToken(null);
+    setUser(null);
+
+    window.location.href = "/";
   };
 
-  // Sync logout across tabs
+  // Auto-load user on page refresh
+  const loadUser = async () => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    if (accessToken) {
+      try {
+        const res = await profileApi();
+        setUser(res.data);
+      } catch {
+        logout();
+      }
+    }
+  };
+
   useEffect(() => {
-    const sync = () => setToken(localStorage.getItem("token"));
-    window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    loadUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, accessToken, isAuthenticated, login, logout, loadUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
