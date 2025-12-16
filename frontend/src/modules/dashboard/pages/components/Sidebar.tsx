@@ -17,7 +17,7 @@ export default function Sidebar() {
             <Home size={20} /> Dashboard
           </Link>
 
-          <Link to="/attendance" className="flex items-center gap-3 hover:text-gray-200">
+          <Link to="/my-attendance" className="flex items-center gap-3 hover:text-gray-200">
             <Camera size={20} /> Attendance
           </Link>
 
@@ -28,6 +28,9 @@ export default function Sidebar() {
           <Link to="/check-in" className="flex items-center gap-3 hover:text-gray-200">
             <Camera size={20} /> Mark-Attendance
           </Link>
+          <Link to="/employees" className="flex items-center gap-3 hover:text-gray-200">
+            <Camera size={20} />Employees</Link>
+
         </nav>
       </div>
 

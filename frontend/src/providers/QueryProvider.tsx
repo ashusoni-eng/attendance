@@ -8,9 +8,9 @@ import {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,                 // 1 retry on failure
-      refetchOnWindowFocus: false, // Do NOT refetch when switching tabs
-      staleTime: 1000 * 60 * 1, // Data fresh for 1 min
+      retry: 1,                
+      refetchOnWindowFocus: false, 
+      staleTime: 1000 * 60 * 1, 
     },
   },
 });

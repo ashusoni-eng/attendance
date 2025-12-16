@@ -43,11 +43,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAccessToken(token);
     setUser(user);
   };
-  useEffect(() => {
-  console.log("AUTH USER 👉", user);
-}, [user]);
-
-
   const logout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
