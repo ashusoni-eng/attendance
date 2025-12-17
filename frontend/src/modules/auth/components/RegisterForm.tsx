@@ -37,34 +37,36 @@ export default function RegisterForm() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async (data: RegisterInputs) => {
-    try {
-      await authApi.register({
-        fullName: data.name,
-        email: data.email,
-        password: data.password,
-      });
+const onSubmit = async (data: RegisterInputs) => {
+  try {
+    await authApi.register({
+      fullName: data.name,
+      email: data.email,
+      password: data.password,
+      phone: data.mobile,
+    });
 
-      await Swal.fire({
-        icon: "success",
-        title: "Registration Successful!",
-        text: "Your account has been created. Please login.",
-        confirmButtonColor: "#0d9488",
-      });
+    await Swal.fire({
+      icon: "success",
+      title: "Registration Successful!",
+      text: "Your account has been created. Please login.",
+      confirmButtonColor: "#0d9488",
+    });
 
-      window.location.href = "/";
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.message || "Error registering user.";
+    window.location.href = "/";
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message || "Error registering user.";
 
-      Swal.fire({
-        icon: "error",
-        title: "Registration Failed",
-        text: message,
-        confirmButtonColor: "#dc2626",
-      });
-    }
-  };
+    Swal.fire({
+      icon: "error",
+      title: "Registration Failed",
+      text: message,
+      confirmButtonColor: "#dc2626",
+    });
+  }
+};
+
 
   return (
     <div>

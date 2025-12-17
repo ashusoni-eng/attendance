@@ -31,7 +31,7 @@ axiosClient.interceptors.response.use(
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
 
-      window.location.href = "/login"; // redirect to login
+      window.location.href = "/"; // redirect to login
     }
 
     return Promise.reject(error);

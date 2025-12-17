@@ -1,4 +1,4 @@
-import { LeaveType } from "@prisma/client"
+
 import { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from "class-validator"
 
 export class CreateLeaveTypeDto{

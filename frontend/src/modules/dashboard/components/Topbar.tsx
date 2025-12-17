@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useAuth } from "../../../../providers/AuthProvider";
-import { ChevronDown } from "lucide-react"; 
+import { useAuth } from "../../../providers/AuthProvider";
+import { ChevronDown } from "lucide-react";
 
 export default function Topbar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
@@ -16,16 +16,21 @@ export default function Topbar() {
           onClick={() => setOpen(!open)}
           className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
         >
-          {/* Profile Icon / Avatar */}
+          {/* Avatar */}
           <div className="w-9 h-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold">
-            U
+            {user?.fullName?.charAt(0).toUpperCase() || "U"}
           </div>
 
           {/* Name */}
-          <span className="font-medium text-gray-700">User</span>
+          <span className="font-medium text-gray-700">
+            {user?.fullName || "User"}
+          </span>
 
           {/* Arrow */}
-          <ChevronDown size={18} className={`transition ${open ? "rotate-180" : ""}`} />
+          <ChevronDown
+            size={18}
+            className={`transition ${open ? "rotate-180" : ""}`}
+          />
         </button>
 
         {/* Dropdown Menu */}
