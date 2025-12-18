@@ -6,5 +6,8 @@ export const attendanceApi = {
         "Content-Type": "multipart/form-data",
       },
     }),
+    getMyAttendance: (userId: string) =>
+    axiosClient.get(`/attendance/${userId}`),
 };
+
 

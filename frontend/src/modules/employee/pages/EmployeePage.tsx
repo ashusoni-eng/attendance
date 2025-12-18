@@ -1,50 +1,78 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../providers/AuthProvider";
-import type { Employee } from "../types/employee.types";
+import { employeeApi } from "../api/employee.api";
+import type { user as USER } from "../types/employee.types";
 
 import EmployeeTable from "../components/EmployeeTable";
 import AddEmployeeModal from "../components/AddEmployeeModal";
 
 export default function EmployeesPage() {
-  const { user } = useAuth(); // 🔥 LOGIN USER
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<USER[]>([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      const loggedInEmployee: Employee = {
-        id: user.id,
-        name: user.fullName,
-        email: user.email,
-   
-        createdAt: new Date().toISOString(),
-        role: "Employee",
-        status: "Active"
-      };
+  // 🔥 FETCH FROM BACKEND
+  const fetchEmployees = async () => {
+    try {
+      setLoading(true);
 
-      setEmployees([loggedInEmployee]); // 👈 table data
+      const res = await employeeApi.getAll();
+
+
+
+      const list = res.data.data.items || [];
+
+      // 🔥 MAP BACKEND → FRONTEND TYPE
+      const mappedEmployees: USER[] = list.map((u: any) => ({
+        id: u.id,
+        name: u.fullName,
+        email: u.email,
+        role: u.accountType,
+        status: u.isActive ? "Active" : "Inactive",
+        createdAt: u.createdAt,
+      }));
+
+      setEmployees(mappedEmployees);
+    } catch (error) {
+      console.error("Failed to fetch employees", error);
+    } finally {
+      setLoading(false);
     }
-  }, [user]);
+  };
+
+  // INITIAL LOAD
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   return (
     <div className="p-6">
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Employees</h1>
 
         <button
           onClick={() => setShowAdd(true)}
-          className="px-4 py-2 bg-teal-600 text-white rounded shadow"
+          className="px-4 py-2 bg-teal-600 text-white rounded shadow cursor-pointer hover:bg-teal-700 transition"
         >
           + Add Employee
         </button>
       </div>
 
-      <EmployeeTable data={employees} />
+      {/* TABLE */}
+      {loading ? (
+        <p className="text-gray-600">Loading employees...</p>
+      ) : (
+        <EmployeeTable data={employees} />
+      )}
 
+      {/* ADD EMPLOYEE MODAL */}
       {showAdd && (
         <AddEmployeeModal
           onClose={() => setShowAdd(false)}
-          onSuccess={() => setShowAdd(false)}
+          onSuccess={() => {
+            setShowAdd(false);
+            fetchEmployees(); // 🔥 REFRESH TABLE AFTER ADD
+          }}
         />
       )}
     </div>

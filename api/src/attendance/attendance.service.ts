@@ -143,13 +143,16 @@ export class AttendanceService {
           });
         }
       }
+      // where.AND.push({ userId: id })
       const items = await this.prisma.attendence.findMany({
+        
         where,
         include: { user: { select: { fullName: true, email: true, phone: true } } },
         skip,
         take,
         orderBy: { createdAt: "asc" }
       })
+      console.log( items)
       const total = await this.prisma.attendence.count({ where: { id } })
       return formatPaginatedResponse<any>(items, total, page, perPage)
     }

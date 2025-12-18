@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { leaveApi } from "../api/leave.api";
 import type{ LeaveRequest } from "../types/leave.types";
-import LeaveTable from "../components/LeaveTable";
+import LeaveTable from "../components/Leavetable";
 
 export default function MyLeavesPage() {
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);

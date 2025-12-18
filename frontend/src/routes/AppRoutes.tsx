@@ -8,6 +8,7 @@ import EmployeesPage from "../modules/employee/pages/EmployeePage";
 
 import MainLayout from "../layouts/Mainlayout";
 import MarkAttendancePage from "../modules/attendance/pages/MarkAttendancePage";
+import MyAttendancePage from "../modules/attendance/pages/MyAttendancePage";
 import ApplyLeavePage from "../modules/leave/pages/ApplyLeavePage";
 import MyLeavesPage from "../modules/leave/pages/MyLeavePage";
 import AdminLeaveTypesPage from "../modules/leave/pages/AdminLeaveTypesPage";
@@ -16,7 +17,7 @@ import ProtectedRoute from "./ProtectedRoutes";
 
 
 export default function AppRoutes() {
-   console.log("🧭 AppRoutes mounted");
+  
   return (
     <Routes>
 
@@ -30,19 +31,13 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
  <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/attendance" element={<MarkAttendancePage />} />
-        <Route path="/employees" element={<EmployeesPage />} />
+       < Route path="/my-attendance" element={<MyAttendancePage />} />
+        <Route path="/employee" element={<EmployeesPage />} />
         <Route path="/apply-leave" element={<ApplyLeavePage />} />
         <Route path="/my-leaves" element={<MyLeavesPage />} />
         <Route path="/admin/leave-types" element={<AdminLeaveTypesPage />} />
-        <Route
-  path="/admin/leave-entitlements"
-  element={<AdminLeaveEntitlementsPage />}
-  
-/> </Route>
-  
-
-
-
+        <Route path="/admin/leave-entitlements"
+  element={<AdminLeaveEntitlementsPage />}/> </Route>
 
       </Route>
     </Routes>

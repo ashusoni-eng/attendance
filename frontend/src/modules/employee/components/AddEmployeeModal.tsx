@@ -1,68 +1,216 @@
-import { useState } from "react";
-import { employeeApi } from "../api/employee.api";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import Swal from "sweetalert2";
+import { employeeApi } from "../api/employee.api";
 
 interface Props {
   onClose: () => void;
   onSuccess: () => void;
 }
 
+interface FormValues {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: "ADMIN" | "USER";
+}
+
+const schema = yup.object({
+  name: yup.string().required("Full name is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  phone: yup
+    .string()
+    .matches(/^[0-9]{10}$/, "Enter valid 10 digit phone number")
+    .required("Phone number is required"),
+  password: yup
+    .string()
+    .min(6, "Minimum 6 characters")
+    .required("Password is required"),
+  role: yup.mixed<"ADMIN" | "USER">().oneOf(["ADMIN", "USER"]).required(),
+});
+
 export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      role: "USER",
+    },
+  });
 
-  const [role, setRole] = useState("Employee");
-
-  const handleSubmit = async () => {
+  const onSubmit = async (data: FormValues) => {
     try {
-      await employeeApi.add({ name, email, role });
-      Swal.fire("Success", "Employee added successfully", "success");
+      await employeeApi.add({
+        fullName: data.name,
+        email: data.email,
+        password: data.password,
+        phone: data.phone,
+        accountType: data.role,
+      });
+
+      await Swal.fire({
+        icon: "success",
+        title: "Employee Added",
+        text: "Employee account created successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      reset();
       onSuccess();
-      onClose();
-    } catch {
-      Swal.fire("Error", "Failed to add employee", "error");
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text:
+          error?.response?.data?.message ||
+          "Unable to create employee",
+      });
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg w-200 h-fit">
-        <h2 className="  text-xl font-semibold mb-4">Add Employee</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5">
 
-        <input
-          className="border rounded-lg p-2 w-full mb-3"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        {/* HEADER */}
+        <h2 className="text-xl font-bold text-gray-800 mb-5">
+          Add Employee
+        </h2>
 
-        <input
-          className="border rounded-lg p-2 w-full mb-3"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <select
-          className="border rounded-lg p-2 w-full mb-4"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit(onSubmit, () => {
+            Swal.fire({
+              icon: "warning",
+              title: "Incomplete Form",
+              text: "Please fill all required fields correctly",
+            });
+          })}
+          className="space-y-4"
         >
-          <option value="Employee">Employee</option>
-          <option value="Admin">Admin</option>
-        </select>
 
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 border rounded-lg">
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-teal-600 text-white rounded-lg"
-          >
-            Add
-          </button>
-        </div>
+          {/* NAME */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
+            <input
+              {...register("name")}
+              className={`mt-1 w-full px-3 py-2 border rounded-md ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter full name"
+            />
+            {errors.name && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
+
+          {/* EMAIL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              {...register("email")}
+              type="email"
+              className={`mt-1 w-full px-3 py-2 border rounded-md ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter email"
+            />
+            {errors.email && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          {/* PHONE */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
+            <input
+              {...register("phone")}
+              type="text"
+              maxLength={10}
+              className={`mt-1 w-full px-3 py-2 border rounded-md ${
+                errors.phone ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter 10 digit phone number"
+            />
+            {errors.phone && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.phone.message}
+              </p>
+            )}
+          </div>
+
+          {/* PASSWORD */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              {...register("password")}
+              type="password"
+              className={`mt-1 w-full px-3 py-2 border rounded-md ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter password"
+            />
+            {errors.password && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          {/* ROLE */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Role
+            </label>
+            <select
+              {...register("role")}
+              className={`mt-1 w-full px-3 py-2 border rounded-md ${
+                errors.role ? "border-red-500" : "border-gray-300"
+              }`}
+            >
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+
+          {/* ACTIONS */}
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 rounded-md bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 cursor-pointer"
+            >
+              {isSubmitting ? "Adding..." : "Add Employee"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

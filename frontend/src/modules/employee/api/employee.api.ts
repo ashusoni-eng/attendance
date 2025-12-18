@@ -1,11 +1,13 @@
 import axiosClient from "../../../core/axios/axiosClient";
 
 export const employeeApi = {
-  getAll: () => axiosClient.get("/employees"),
+  getAll: () => axiosClient.get("admin/user"),
 
   add: (data: {
-    name: string;
+    fullName: string;
     email: string;
-    role: string;
-  }) => axiosClient.post("/employees", data),
+    password: string;
+    phone:string;
+    accountType: "ADMIN" | "USER";
+  }) => axiosClient.post("admin/user", data),
 };
