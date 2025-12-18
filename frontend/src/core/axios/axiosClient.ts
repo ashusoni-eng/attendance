@@ -1,8 +1,7 @@
 import axios from "axios";
 
-// 👇 IMPORTANT: Put your NEXT.JS backend API base URL here
-const BASE_URL = "http://localhost:3000/api"; 
-// Example: http://localhost:3000/api (Next.js routes)
+// 👇 NESTJS BACKEND URL (NOT Next.js)
+const BASE_URL = "http://localhost:3001"; 
 
 const axiosClient = axios.create({
   baseURL: BASE_URL,
@@ -11,10 +10,10 @@ const axiosClient = axios.create({
   },
 });
 
-// 🔐 Add token automatically (AuthProvider se)
+// 🔐 Add access token automatically
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken"); // store token as accessToken
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,10 +26,12 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // 401 → unauthorized → logout user
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/";
+      // Token expired → user ko logout
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      window.location.href = "/"; // redirect to login
     }
 
     return Promise.reject(error);

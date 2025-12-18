@@ -1,5 +1,5 @@
 import DashboardLayout from "../layout/DashboardLayout";
-import DashboardCards from "../pages/components/DashboardCards";
+import DashboardCards from "../components/DashboardCards";
 
 export default function DashboardPage() {
   return (

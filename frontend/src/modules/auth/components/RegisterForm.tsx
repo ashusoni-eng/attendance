@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 interface RegisterInputs {
   name: string;
   email: string;
+  mobile: string;
   password: string;
   confirmPassword: string;
 }
@@ -14,6 +15,12 @@ interface RegisterInputs {
 const schema = yup.object({
   name: yup.string().required("Name is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
+
+  mobile: yup
+    .string()
+    .required("Mobile number is required")
+    .matches(/^[0-9]{10}$/, "Enter valid 10-digit mobile number"),
+
   password: yup.string().min(6, "Minimum 6 chars").required("Password required"),
   confirmPassword: yup
     .string()
@@ -30,36 +37,36 @@ export default function RegisterForm() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async (data: RegisterInputs) => {
-    try {
-      await authApi.register({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      });
+const onSubmit = async (data: RegisterInputs) => {
+  try {
+    await authApi.register({
+      fullName: data.name,
+      email: data.email,
+      password: data.password,
+      phone: data.mobile,
+    });
 
-      // SUCCESS POPUP
-      await Swal.fire({
-        icon: "success",
-        title: "Registration Successful!",
-        text: "Your account has been created. Please login.",
-        confirmButtonColor: "#0d9488",
-      });
+    await Swal.fire({
+      icon: "success",
+      title: "Registration Successful!",
+      text: "Your account has been created. Please login.",
+      confirmButtonColor: "#0d9488",
+    });
 
-      window.location.href = "/";
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.message || "Error registering user.";
+    window.location.href = "/";
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message || "Error registering user.";
 
-      // ERROR POPUP
-      Swal.fire({
-        icon: "error",
-        title: "Registration Failed",
-        text: message,
-        confirmButtonColor: "#dc2626",
-      });
-    }
-  };
+    Swal.fire({
+      icon: "error",
+      title: "Registration Failed",
+      text: message,
+      confirmButtonColor: "#dc2626",
+    });
+  }
+};
+
 
   return (
     <div>
@@ -83,11 +90,8 @@ export default function RegisterForm() {
               {...register("name")}
               type="text"
               placeholder="Enter your full name"
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 focus:outline-none sm:text-sm ${
-                errors.name
-                  ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:ring-teal-500 focus:border-teal-500"
-              }`}
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 
+                ${errors.name ? "border-red-500" : "border-gray-300"}`}
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -103,14 +107,29 @@ export default function RegisterForm() {
               {...register("email")}
               type="email"
               placeholder="Enter your email"
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 focus:outline-none sm:text-sm ${
-                errors.email
-                  ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:ring-teal-500 focus:border-teal-500"
-              }`}
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 
+                ${errors.email ? "border-red-500" : "border-gray-300"}`}
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            )}
+          </div>
+
+          {/* Mobile Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Mobile Number
+            </label>
+            <input
+              {...register("mobile")}
+              type="text"
+              placeholder="Enter 10-digit mobile number"
+              maxLength={10}
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 
+                ${errors.mobile ? "border-red-500" : "border-gray-300"}`}
+            />
+            {errors.mobile && (
+              <p className="mt-1 text-sm text-red-600">{errors.mobile.message}</p>
             )}
           </div>
 
@@ -123,11 +142,8 @@ export default function RegisterForm() {
               {...register("password")}
               type="password"
               placeholder="Enter password"
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 focus:outline-none sm:text-sm ${
-                errors.password
-                  ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:ring-teal-500 focus:border-teal-500"
-              }`}
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 
+                ${errors.password ? "border-red-500" : "border-gray-300"}`}
             />
             {errors.password && (
               <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
@@ -143,11 +159,8 @@ export default function RegisterForm() {
               {...register("confirmPassword")}
               type="password"
               placeholder="Confirm your password"
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 focus:outline-none sm:text-sm ${
-                errors.confirmPassword
-                  ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:ring-teal-500 focus:border-teal-500"
-              }`}
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm mt-1 placeholder-gray-400 
+                ${errors.confirmPassword ? "border-red-500" : "border-gray-300"}`}
             />
             {errors.confirmPassword && (
               <p className="mt-1 text-sm text-red-600">
@@ -156,13 +169,12 @@ export default function RegisterForm() {
             )}
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm 
-              text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
+            className="w-full flex justify-center py-2 px-4 rounded-md 
+              text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50"
           >
             {isSubmitting ? "Registering..." : "Register"}
           </button>

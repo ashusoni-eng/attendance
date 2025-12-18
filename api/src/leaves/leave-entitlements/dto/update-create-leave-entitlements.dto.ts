@@ -1,7 +1,4 @@
-import { LeaveType } from "@prisma/client"
-import { Type } from "class-transformer";
-import { IsInt, IsNotEmpty, IsString, Min, ValidateNested } from "class-validator";
-import { CreateLeaveTypeDto } from "../../leave-type/create-leave-type.dto";
+import { IsInt, IsNotEmpty, IsString, Min } from "class-validator";
 
 export class UpdateLeaveEntitlementDto {
 
