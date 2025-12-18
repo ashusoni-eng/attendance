@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { profileApi } from "../modules/user/api/user.api";
 
 interface User {
@@ -14,7 +14,6 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string, refreshToken: string, user: User) => void;
   logout: () => void;
-  loadUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,11 +29,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.getItem("accessToken")
   );
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  });
 
   const isAuthenticated = !!accessToken;
 
-  // Called after successful login
   const login = (token: string, refreshToken: string, user: User) => {
     localStorage.setItem("accessToken", token);
     localStorage.setItem("refreshToken", refreshToken);
@@ -43,47 +44,38 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAccessToken(token);
     setUser(user);
   };
-  useEffect(() => {
-  console.log("AUTH USER 👉", user);
-}, [user]);
-
 
   const logout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-
+    localStorage.clear();
     setAccessToken(null);
     setUser(null);
-
     window.location.href = "/";
   };
 
-  // Auto-load user on page refresh
-  const loadUser = async () => {
-    const storedUser = localStorage.getItem("user");
+  // 🔕 Optional backend sync — SAFE
+  useEffect(() => {
+    if (!accessToken) return;
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
-    if (accessToken) {
+    const syncProfile = async () => {
       try {
         const res = await profileApi();
-        setUser(res.data);
-      } catch {
-        logout();
-      }
-    }
-  };
 
-  useEffect(() => {
-    loadUser();
+        // ✅ only update if fullName exists
+        if (res?.data?.fullName) {
+          setUser(res.data);
+          localStorage.setItem("user", JSON.stringify(res.data));
+        }
+      } catch {
+        // ❌ DO NOTHING — keep local user
+      }
+    };
+
+    syncProfile();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, isAuthenticated, login, logout, loadUser }}
+      value={{ user, accessToken, isAuthenticated, login, logout }}
     >
       {children}
     </AuthContext.Provider>
