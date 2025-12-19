@@ -39,7 +39,7 @@ export default function Sidebar() {
           {/* ADMIN ONLY */}
           {isAdmin && (
             <>
-              <Link to="/employees" className="flex items-center gap-3 hover:text-gray-200">
+              <Link to="/employee" className="flex items-center gap-3 hover:text-gray-200">
                 <Camera size={20} /> Employees
               </Link>
 

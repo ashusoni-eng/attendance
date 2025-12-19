@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { profileApi } from "../modules/user/api/user.api";
 
 interface User {
+  photo: string | undefined;
   id: string;
   email: string;
   fullName: string;
