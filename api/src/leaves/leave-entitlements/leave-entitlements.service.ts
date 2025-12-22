@@ -10,11 +10,18 @@ export class LeaveEntitlementService {
             if (!leaveEntitlementDto || !leaveEntitlementDto.leave_type_id) {
                 throw new BadRequestException("Leave Details Incomplete")
             }
-            const data = await this.prismaService.leave_entitlements.create({ data: { ...leaveEntitlementDto } })
+            const data = await this.prismaService.leave_entitlements.create({ data: { ...leaveEntitlementDto,remaining_leaves:leaveEntitlementDto.total_leaves } })
             return data
         }
         catch (e: any) {
             throw new InternalServerErrorException("Leave Not Assigned To User. Contact Aeologic Team")
         }
+    }
+    async findOne(leaveEntitlementId:string){
+        if(!leaveEntitlementId){
+            throw new BadRequestException("--remove Leave Entitlement Id Not Passed --add Leave type not selected")
+        }
+        return await this.prismaService.leave_entitlements.findUnique({where:{id:leaveEntitlementId}})
+        
     }
 }

@@ -8,7 +8,9 @@ import { mkdir, writeFile } from 'fs/promises';
 import { AttendanceType } from 'src/types/common';
 import { formatPaginatedResponse, getPaginationOptions } from 'src/common/lib/pagination-helper';
 import { saveFile } from 'src/common/lib/fileHandling';
-import { AccountType } from '@prisma/client';
+import { AccountType, LocationStatus, Status } from '@prisma/client';
+import { DAY } from 'src/common/lib/datehelper';
+import { getLocationStatus } from 'src/common/lib/checkLocation';
 
 
 @Injectable()
@@ -21,48 +23,85 @@ export class AttendanceService {
     try {
       // extract userID
       if (!createAttendanceDto || !image) {
-        new BadRequestException("You have not Uploaded the image file  or userId or location details")
+        throw new BadRequestException("You have not Uploaded the image file  or userId or location details")
       }
       const userId: string = createAttendanceDto.userId;
       const userExist = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, email: true } })
-      if (userExist) {
-        const userEmail = userExist.email
-        //save Image
-        const finalPath = await saveFile(image, userEmail) as string;
-        // save attendence
-        const attendance: AttendanceType = {
-          userId,
-          location: {
-            longitude: createAttendanceDto.longitude,
-            latitude: createAttendanceDto.longitude
-          },
-          imagePath: finalPath
-        }
-        // --add check attendance already marked or not wrt 24 hour
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
+      if (!userExist) {
+        throw new BadRequestException(`User doen't exist with ${userId} ID `)
+      }
+      // --add check attendance already marked or not wrt 24 hour
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
 
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
 
-        const isAttendanceMarked = await this.prisma.attendence.findFirst({
-          where: {
-            userId, createdAt: { gte: startOfDay, lte: endOfDay }
-          }
-        })
-        if (isAttendanceMarked) {
-          return new BadRequestException("Attendance Already Marked");
+      const isAttendanceMarked = await this.prisma.attendence.findFirst({
+        where: {
+          userId, createdAt: { gte: startOfDay, lte: endOfDay }
         }
-
-        const attendanceCreated = await this.prisma.attendence.create({
-          data: { ...attendance, status: "PRESENT" }
-        })
-        if (!attendance) {
-          return new InternalServerErrorException("Try contacting Aeologic team");
-        }
-        return attendanceCreated;
+      })
+      if (isAttendanceMarked) {
+        return new BadRequestException("Attendance Already Marked");
+      }
+      const userEmail = userExist.email
+      //save Image
+      const finalPath = await saveFile(image, userEmail) as string;
+      // save attendence
+      let attendance:any = {
+        userId,
+        location: {
+          longitude: createAttendanceDto.longitude,
+          latitude: createAttendanceDto.longitude
+        },
+        imagePath: finalPath
 
       }
+      //check time 9am-8pm -> location check (Present | Late) and (Outside | inside office)
+      //check time not in 9am- 8pm so (Late and Outside_office)
+      const hourOfDay=new Date().getHours();
+      if(hourOfDay>=9 && hourOfDay <=20 ){
+
+        const locationStatus:LocationStatus=getLocationStatus(parseFloat(attendance.location.longitude),parseFloat(attendance.location.latitude))
+        if(!locationStatus){
+          throw new BadRequestException("use correct co-ordinates")
+        }
+        let status:Status=Status.PRESENT;
+        if(hourOfDay>12){
+          status=Status.LATE
+        }
+        attendance.status=status;
+        attendance.locationStatus=locationStatus;
+      }
+      else{
+        attendance.status=Status.ABSENT
+        attendance.locationStatus=LocationStatus.OUTSIDE_OFFICE
+      }
+      //check weather the attendance lies in weekEnddays 
+      const day: number = new Date().getDay()
+      if (day === 0 || day === 1) {
+        attendance.is_available_on_weekend = { day: DAY[day] }
+      }
+      // check weather present in hoildays
+
+      const holidayPresent = await this.prisma.publicHoliday.findUnique({ where: { date: new Date().toLocaleDateString() } })
+      if (holidayPresent) {
+        attendance.is_available_on_holiday = {
+          id: holidayPresent.id,
+          name: holidayPresent.name,
+          description: holidayPresent.description,
+          date: holidayPresent.date
+        }
+      }
+      const attendanceDbObj:AttendanceType={...attendance}
+      const attendanceCreated = await this.prisma.attendence.create({
+        data: { ...attendanceDbObj}
+      })
+      if (!attendance) {
+        return new InternalServerErrorException("Try contacting Aeologic team");
+      }
+      return attendanceCreated;
     }
     catch (e: any) {
       return new Error("Attendence not register try one more time or contact aeologic team")

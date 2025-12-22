@@ -34,10 +34,15 @@ enum Gender {
 
 enum Status{
   PRESENT
-  LATE
   ABSENT
+  LATE
+}
+
+enum LocationStatus{
+  INSIDE_OFFICE
   OUTSIDE_OFFICE
 }
+
 enum RequestStatus{
   PENDING
   APPROVED
@@ -73,6 +78,9 @@ model Attendence{
   createdAt       DateTime @default(now())
   user            User @relation(fields:[userId],references:[id] )
   status          Status
+  locationStatus  LocationStatus
+  is_available_on_weekend       Json?
+  is_available_on_holiday       Json?
 }
 
 model LeaveType{
@@ -89,18 +97,31 @@ model Leave_entitlements{
   userId String
   leave_type_id String
   total_leaves Int
-  used_leaves Int?
-  remaining_leaves Int?
+  used_leaves Int @default(0)
+  remaining_leaves Int
+  under_process Int @default(0)
   user User @relation(fields:[userId],references:[id])
   leaveType LeaveType @relation(fields:[leave_type_id],references:[id])
   createdAt DateTime @default(now())
+  leave_requests Leave_requests[]
 }
 
 model Leave_requests{
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String
+  leave_entitlements_id String
   request_status RequestStatus @default(PENDING)
   createdAt DateTime @default(now())
   user User @relation(fields:[userId],references:[id])
+  leave_entitlements Leave_entitlements @relation(fields:[leave_entitlements_id],references:[id])
+}
+
+model PublicHoliday{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String 
+  description String?
+  date DateTime   @unique @db.Date
+  createdAt DateTime @default(now())
+  updateAt DateTime @default(now())
 }
 
