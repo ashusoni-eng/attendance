@@ -11,6 +11,7 @@ import MarkAttendancePage from "../modules/attendance/pages/MarkAttendancePage";
 import MyAttendancePage from "../modules/attendance/pages/MyAttendancePage";
 import ApplyLeavePage from "../modules/leave/pages/ApplyLeavePage";
 import MyLeavesPage from "../modules/leave/pages/MyLeavePage";
+import ProfilePage from "../modules/dashboard/pages/ProfilePage";
 import AdminLeaveTypesPage from "../modules/leave/pages/AdminLeaveTypesPage";
 import AdminLeaveEntitlementsPage from "../modules/leave/pages/AdminLeaveEntitlementsPage";
 import ProtectedRoute from "./ProtectedRoutes";
@@ -31,7 +32,8 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
  <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/attendance" element={<MarkAttendancePage />} />
-       < Route path="/my-attendance" element={<MyAttendancePage />} />
+        < Route path="/my-attendance" element={<MyAttendancePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/employee" element={<EmployeesPage />} />
         <Route path="/apply-leave" element={<ApplyLeavePage />} />
         <Route path="/my-leaves" element={<MyLeavesPage />} />

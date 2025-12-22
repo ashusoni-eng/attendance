@@ -7,7 +7,7 @@ export const attendanceApi = {
       },
     }),
     getMyAttendance: (userId: string) =>
-    axiosClient.get(`/attendance/${userId}`),
+    axiosClient.get(`employee/attendance/${userId}`),
 };
 
 
