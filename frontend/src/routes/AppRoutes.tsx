@@ -6,7 +6,7 @@ import RegisterPage from "../modules/auth/pages/RegisterPage";
 import DashboardPage from "../modules/dashboard/pages/DashboardPage";
 import EmployeesPage from "../modules/employee/pages/EmployeePage";
 
-import MainLayout from "../layouts/Mainlayout";
+import MainLayout from "../modules/layout/Mainlayout";
 import MarkAttendancePage from "../modules/attendance/pages/MarkAttendancePage";
 import MyAttendancePage from "../modules/attendance/pages/MyAttendancePage";
 import ApplyLeavePage from "../modules/leave/pages/ApplyLeavePage";
@@ -30,7 +30,7 @@ export default function AppRoutes() {
 
   
       <Route element={<ProtectedRoute />}>
- <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/attendance" element={<MarkAttendancePage />} />
         < Route path="/my-attendance" element={<MyAttendancePage />} />
         <Route path="/profile" element={<ProfilePage />} />

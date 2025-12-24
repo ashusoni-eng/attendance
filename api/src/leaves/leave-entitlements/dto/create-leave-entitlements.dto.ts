@@ -13,4 +13,5 @@ export class CreateLeaveEntitlementDto {
     @IsInt()
     @Min(0)
     total_leaves: number;
+
 }
