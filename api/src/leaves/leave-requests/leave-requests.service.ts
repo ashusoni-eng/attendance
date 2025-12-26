@@ -4,26 +4,49 @@ import { CreateLeaveRequestDto } from "./dto/create-leave-requests.dto";
 import { LeaveEntitlementService } from "../leave-entitlements/leave-entitlements.service";
 import { UpdateLeaveRequestDto } from "./dto/update-leave-requests.dto";
 import { RequestStatus } from "@prisma/client";
+import { findNoOfWeekendsDays, TfindNoOfWeekendsDays } from "src/common/lib/dateutil";
+import { PublicHolidaysService } from "src/public-holidays/public-holidays.service";
+import { formatPaginatedResponse, getPaginationOptions } from "src/common/lib/pagination-helper";
 
 @Injectable()
 export class LeaveRequestService {
-    constructor(private readonly prismaService: PrismaService, private leaveEntitlementService: LeaveEntitlementService) { }
+    constructor(private readonly prismaService: PrismaService, private leaveEntitlementService: LeaveEntitlementService, private publicHolidaysService: PublicHolidaysService) { }
     async create(createLeaveRequest: CreateLeaveRequestDto) {
         try {
-            if (!createLeaveRequest.leaveDays || createLeaveRequest.leaveDays < 1) {
-                throw new BadRequestException('leaveDays must be at least 1');
+            if (!createLeaveRequest.from || !createLeaveRequest.to || createLeaveRequest.from.getTime() > createLeaveRequest.to.getTime()) {
+                // previous date nhi honi chiye
+                throw new BadRequestException('Date not selected or from Date is greater than to Date');
             }
-            
-            // previous date nhi honi chiye
+
+            createLeaveRequest.from.setHours(0)
+            createLeaveRequest.from.setMinutes(0);
+            createLeaveRequest.from.setSeconds(0);
+            createLeaveRequest.from.setMilliseconds(0);
+
+            createLeaveRequest.to.setHours(0)
+            createLeaveRequest.to.setMinutes(0);
+            createLeaveRequest.to.setSeconds(0);
+            createLeaveRequest.to.setMilliseconds(0);
+            // --------------------------------------------------------------
+            // check apply leave date range should not lies btw already requested leaves
+            // OR
+            // per day one time leave apply
+            // --------------------------------------------------------------
+
+            const WeekendDate = findNoOfWeekendsDays(createLeaveRequest.from, createLeaveRequest.to);
+            const noOfHolidays = await this.publicHolidaysService.totalHolidays(createLeaveRequest.from, createLeaveRequest.to);
+            const weekDaysDuringHolidays = TfindNoOfWeekendsDays(noOfHolidays);
             // holidays and week off  remove from total leaves
+            const leaveDays = WeekendDate + noOfHolidays.length - weekDaysDuringHolidays;
+
 
             // check entitlement exists
             const isPresent = await this.leaveEntitlementService.findOne(createLeaveRequest.leave_entitlements_id);
             if (!isPresent) {
                 throw new BadRequestException("This leave type is not assigned to you");
             }
-            // check balance 
-            if (isPresent.remaining_leaves < createLeaveRequest.leaveDays) {
+            // check balance and leaveDays reflects days excluding holidays and weekend days                                                                                                                                                                                                                                                                                        
+            if (isPresent.remaining_leaves < leaveDays) {
                 throw new UnprocessableEntityException('Insufficient Leave balance');
             }
 
@@ -32,8 +55,8 @@ export class LeaveRequestService {
                 const updatedEnt = await tx.leave_entitlements.update({
                     where: { id: createLeaveRequest.leave_entitlements_id },
                     data: {
-                        under_process: { increment: createLeaveRequest.leaveDays },
-                        remaining_leaves: { decrement: createLeaveRequest.leaveDays },
+                        under_process: { increment: leaveDays },
+                        remaining_leaves: { decrement: leaveDays },
                     },
                 });
 
@@ -41,6 +64,8 @@ export class LeaveRequestService {
                     data: {
                         userId: createLeaveRequest.userId,
                         leave_entitlements_id: createLeaveRequest.leave_entitlements_id,
+                        from: createLeaveRequest.from,
+                        to: createLeaveRequest.to
                     },
                 });
 
@@ -54,31 +79,65 @@ export class LeaveRequestService {
         }
     }
     //add user,date and request_status 
-    async findAllByAdmin() {
+    async findAllByAdmin(request_status: RequestStatus|undefined,page:number,perPage:number, from: Date|undefined, to: Date) {
         try {
+            const {take,skip}=getPaginationOptions({page,perPage})
+            const where: any = {}
+            // if (leave_entitlements_id) {
+            //     where.AND.push(leave_entitlements_id);
+            // }
+            if (request_status) {
+                where.AND.push(request_status);
+            }
+            if (to) {
+                where.AND.push(to)
+            }
+            if (from) {
+                where.AND.push(from)
+            }
             const pendingRequest = await this.prismaService.leave_requests.findMany({
-                where: { request_status: "PENDING" }
+                where,
+                orderBy: { createdAt: 'desc' }
             })
-            return pendingRequest;
+            const total=await this.prismaService.leave_requests.count({where})
+            
+            return formatPaginatedResponse<any>(pendingRequest,total,page,perPage);
         }
         catch (e: any) {
             throw new InternalServerErrorException("Try one more time or connect Aeologic support team")
         }
     }
     //add date, request_status filter
-    async findAllByEmployee(userId: string) {
+    async findAllByEmployee(userId: string, request_status: string, page: number, perPage: number, from: Date, to: Date) {
         try {
+            const { take, skip } = getPaginationOptions({ page, perPage })
+            const where: any = {}
+            if (userId) {
+                where.AND.push(userId);
+            }
+            if (request_status) {
+                where.AND.push(request_status);
+            }
+            if (to) {
+                where.AND.push(to)
+            }
+            if (from) {
+                where.AND.push(from)
+            }
             const pendingLeaveRequest = await this.prismaService.leave_requests.findMany({
-                where: { userId, request_status: "PENDING" }
+                where,
+                take,
+                skip
             })
-            return pendingLeaveRequest;
+            const total = await this.prismaService.leave_requests.count({ where });
+            return formatPaginatedResponse<any>(pendingLeaveRequest, total, page, perPage);
         }
         catch (e: any) {
             throw new InternalServerErrorException("Try one more time or connect Aeologic support team")
         }
     }
     async findOne() {
-        
+
     }
     async updateByAdmin(updateLeaveRequestDto: UpdateLeaveRequestDto) {
         try {

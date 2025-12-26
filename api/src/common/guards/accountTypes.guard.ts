@@ -18,7 +18,7 @@ export class AccountTypesGuard implements CanActivate {
       ACCOUNT_TYPES_KEY,
       [context.getHandler(), context.getClass()],
     );
-
+    
     if (!requiredRoles) {
       return true;
     }

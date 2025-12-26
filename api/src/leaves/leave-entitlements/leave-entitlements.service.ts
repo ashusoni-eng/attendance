@@ -24,4 +24,20 @@ export class LeaveEntitlementService {
         return await this.prismaService.leave_entitlements.findUnique({where:{id:leaveEntitlementId}})
         
     }
+    async findLeaves(userId:string){
+        try{
+            if(userId){
+            throw new BadRequestException("Must pass user Id")
+        }
+        return await this.prismaService.leave_entitlements.findMany({
+            where:{userId}
+        })
+        }
+        catch(e:any){
+            if(e instanceof BadRequestException){
+                throw e;
+            }
+            throw new InternalServerErrorException("DB issue")
+        }
+    }
 }
