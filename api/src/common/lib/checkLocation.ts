@@ -1,4 +1,9 @@
-import { LocationStatus, Status } from "@prisma/client";
+// local LocationStatus because @prisma/client does not export it
+export enum LocationStatus {
+    INSIDE_OFFICE = "INSIDE_OFFICE",
+    OUTSIDE_OFFICE = "OUTSIDE_OFFICE"
+}
+
 import { booleanPointInPolygon, point, polygon } from "@turf/turf";
 
 export const getLocationStatus = (longitude: number, latitude: number):LocationStatus => {

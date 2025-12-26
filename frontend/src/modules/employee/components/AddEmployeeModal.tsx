@@ -3,6 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Swal from "sweetalert2";
 import { employeeApi } from "../api/employee.api";
+import { XMarkIcon, UserIcon, EnvelopeIcon, PhoneIcon, LockClosedIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   onClose: () => void;
@@ -76,13 +77,21 @@ export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5">
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all overflow-hidden">
         {/* HEADER */}
-        <h2 className="text-xl font-bold text-gray-800 mb-5">
-          Add Employee
-        </h2>
+        <div className="bg-linear-to-r from-teal-600 to-teal-700 px-6 py-5 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold text-white">Add New Employee</h2>
+            <p className="text-teal-100 text-sm mt-1">Create a new employee account</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full p-1.5 transition-all"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        </div>
 
         {/* FORM */}
         <form
@@ -93,23 +102,30 @@ export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
               text: "Please fill all required fields correctly",
             });
           })}
-          className="space-y-4"
+          className="p-6 space-y-5"
         >
-
           {/* NAME */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Full Name
             </label>
-            <input
-              {...register("name")}
-              className={`mt-1 w-full px-3 py-2 border rounded-md ${
-                errors.name ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Enter full name"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <UserIcon className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...register("name")}
+                className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter full name"
+              />
+            </div>
             {errors.name && (
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-red-600 mt-1 flex items-center">
+                <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
                 {errors.name.message}
               </p>
             )}
@@ -117,19 +133,27 @@ export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
 
           {/* EMAIL */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
             </label>
-            <input
-              {...register("email")}
-              type="email"
-              className={`mt-1 w-full px-3 py-2 border rounded-md ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Enter email"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...register("email")}
+                type="email"
+                className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter email address"
+              />
+            </div>
             {errors.email && (
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-red-600 mt-1 flex items-center">
+                <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
                 {errors.email.message}
               </p>
             )}
@@ -137,20 +161,28 @@ export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
 
           {/* PHONE */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Phone Number
             </label>
-            <input
-              {...register("phone")}
-              type="text"
-              maxLength={10}
-              className={`mt-1 w-full px-3 py-2 border rounded-md ${
-                errors.phone ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Enter 10 digit phone number"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <PhoneIcon className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...register("phone")}
+                type="text"
+                maxLength={10}
+                className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter 10 digit phone number"
+              />
+            </div>
             {errors.phone && (
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-red-600 mt-1 flex items-center">
+                <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
                 {errors.phone.message}
               </p>
             )}
@@ -158,19 +190,27 @@ export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
 
           {/* PASSWORD */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
-            <input
-              {...register("password")}
-              type="password"
-              className={`mt-1 w-full px-3 py-2 border rounded-md ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Enter password"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <LockClosedIcon className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...register("password")}
+                type="password"
+                className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter password"
+              />
+            </div>
             {errors.password && (
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-red-600 mt-1 flex items-center">
+                <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
                 {errors.password.message}
               </p>
             )}
@@ -178,26 +218,36 @@ export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
 
           {/* ROLE */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Role
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Account Role
             </label>
-            <select
-              {...register("role")}
-              className={`mt-1 w-full px-3 py-2 border rounded-md ${
-                errors.role ? "border-red-500" : "border-gray-300"
-              }`}
-            >
-              <option value="USER">User</option>
-              <option value="ADMIN">Admin</option>
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <ShieldCheckIcon className="h-5 w-5 text-gray-400" />
+              </div>
+              <select
+                {...register("role")}
+                className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none transition-all ${
+                  errors.role ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                <option value="USER">User</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           {/* ACTIONS */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
+              className="px-5 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all"
             >
               Cancel
             </button>
@@ -205,9 +255,19 @@ export default function AddEmployeeModal({ onClose, onSuccess }: Props) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-md bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 cursor-pointer"
+              className="px-5 py-2.5 rounded-lg bg-linear-to-r from-teal-600 to-teal-700 text-white font-medium hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50 transition-all flex items-center"
             >
-              {isSubmitting ? "Adding..." : "Add Employee"}
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adding Employee...
+                </>
+              ) : (
+                "Add Employee"
+              )}
             </button>
           </div>
         </form>

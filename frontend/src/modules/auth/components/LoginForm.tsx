@@ -40,7 +40,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     try {
       const response = await authApi.login(data);
 
-      // ✅ FIX HERE
+     
       const { user, accessToken, refreshToken } = response.data.data;
 
       login(accessToken, refreshToken, user);
@@ -53,7 +53,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         showConfirmButton: false,
       });
 
-      // ✅ navigate to dashboard
       onSuccess();
 
     } catch (error: any) {

@@ -2,6 +2,8 @@ import type { Attendance } from "../types/attendance.types";
 import { useState } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, CheckCircleIcon, XCircleIcon, DocumentIcon, FunnelIcon, ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import ViewModal from "./ViewModal";
+import { useAuth } from "../../../providers/AuthProvider";
 
 interface Props {
   data: Attendance[];
@@ -12,6 +14,10 @@ export default function AttendanceTable({ data, isLoading = false }: Props) {
   const [sortField, setSortField] = useState<keyof Attendance | null>("createdAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "PRESENT" | "ABSENT">("ALL");
+  const [selectedAttendance, setSelectedAttendance] = useState<Attendance | null>(null);
+
+  const { user } = useAuth();
+  
 
   // Filter data based on status
   const filteredData = statusFilter === "ALL" 
@@ -41,6 +47,31 @@ export default function AttendanceTable({ data, isLoading = false }: Props) {
       setSortField(field);
       setSortDirection("asc");
     }
+  };
+    const LocationStatus = (
+    status?: "INSIDE_OFFICE" | "OUTSIDE_OFFICE"
+  ) => {
+    if (status === "INSIDE_OFFICE") {
+      return (
+        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800">
+          Inside Office
+        </span>
+      );
+    }
+
+    if (status === "OUTSIDE_OFFICE") {
+      return (
+        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-800">
+          Outside Office
+        </span>
+      );
+    }
+
+    return (
+      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
+        Not Available
+      </span>
+    );
   };
 
   return (
@@ -125,6 +156,9 @@ export default function AttendanceTable({ data, isLoading = false }: Props) {
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Location Status
+              </th>
+               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Proof
               </th>
             </tr>
@@ -194,31 +228,36 @@ export default function AttendanceTable({ data, isLoading = false }: Props) {
                       {att.status}
                     </span>
                   </td>
+                   <td className="px-6 py-4 text-center">
+                      {LocationStatus(att.locationStatus)}
+                    </td>
 
                   {/* Image / Proof */}
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    {att.imagePath ? (
-                      <a
-                        href={att.imagePath}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-                      >
-                        View
-                        <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
-                    ) : (
-                      <span className="text-gray-400 text-sm">—</span>
-                    )}
-                  </td>
+                   <td className="px-6 py-4 text-center">
+                      {att.imagePath ? (
+                        <button
+                          onClick={() => setSelectedAttendance(att)}
+                          className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        >
+                          View
+                        </button>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+      {selectedAttendance && (
+        <ViewModal
+          attendance={selectedAttendance}
+          userName={user?.fullName || "User"}
+          onClose={() => setSelectedAttendance(null)}
+        />
+      )}
 
       {/* Footer with summary */}
       {sortedData.length > 0 && (

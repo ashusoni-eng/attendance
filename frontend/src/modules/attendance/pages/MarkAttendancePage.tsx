@@ -94,35 +94,53 @@ export default function MarkAttendancePage() {
       formData.append("latitude", coords!.latitude.toString());
       formData.append("longitude", coords!.longitude.toString());
       formData.append("image", base64ToFile(image, "attendance.jpg"));
-
+    
       // Submit to API
-      await attendanceApi.markAttendance(formData);
 
-      // Show success message
-      await Swal.fire({
-        icon: "success",
-        title: "Attendance Marked Successfully",
-        text: "You will be redirected to your attendance records",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+  await attendanceApi.markAttendance(formData);
 
-      // Redirect to attendance page
-      navigate("/my-attendance");
-    } catch (error: any) {
-      // Improved error handling with specific messages
-      const errorMessage = error.response?.data?.message || 
-                          "Failed to mark attendance. Please try again.";
-      
-      Swal.fire({
-        icon: "error",
-        title: "Submission Failed",
-        text: errorMessage,
-      });
-    } finally {
-      setLoading(false);
-    }
+  // ✅ SUCCESS CASE
+  await Swal.fire({
+    icon: "success",
+    title: "Attendance Marked Successfully",
+    text: "You will be redirected to your attendance records",
+    timer: 2000,
+    showConfirmButton: false,
+  });
+
+  navigate("/my-attendance"); // redirect after success
+} catch (error: any) {
+  const message =
+    error?.response?.data?.message || "Something went wrong";
+
+  // ⚠️ ALREADY MARKED CASE
+  if (
+    typeof message === "string" &&
+    message.toLowerCase().includes("already")
+  ) {
+    await Swal.fire({
+      icon: "warning",
+      title: "Attendance Already Marked",
+      text: "You have already marked attendance for today",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    navigate("/my-attendance");
+    return;
+  }
+
+  // ❌ GENERIC ERROR
+  await Swal.fire({
+    icon: "error",
+    title: "Failed",
+    text: message,
+  });
+} finally {
+  setLoading(false);
+}
   };
+
 
   // Check if all requirements are met
   const isFormValid = !!user && !!image && !!coords;
