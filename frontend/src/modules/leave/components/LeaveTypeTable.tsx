@@ -7,8 +7,8 @@ interface Props {
 
 export default function LeaveTypeTable({ data, onEdit }: Props) {
   return (
-    <table className="w-full border rounded">
-      <thead className="bg-gray-100">
+    <table className="w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white">
+      <thead className="bg-slate-100 text-gray-700">
         <tr>
           <th className="p-2 text-left">Type</th>
           <th className="p-2 text-left">Description</th>

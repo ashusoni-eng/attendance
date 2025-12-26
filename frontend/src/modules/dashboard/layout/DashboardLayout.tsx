@@ -1,15 +1,15 @@
-import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
+// import Sidebar from "../../layout/Sidebar";
+// import Topbar from "../../layout/Topbar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div>
-      <Sidebar />
-      <Topbar />
+// export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+//   return (
+//     <div>
+//       <Sidebar />
+//       <Topbar />
 
-      <main className="ml-64 mt-16 p-6 bg-gray-50 min-h-screen">
-        {children}
-      </main>
-    </div>
-  );
-}
+//       <main className="ml-64 mt-16 p-6 bg-gray-50 min-h-screen">
+//         {children}
+//       </main>
+//     </div>
+//   );
+// }

@@ -84,8 +84,17 @@ export class AttendanceService {
         attendance.is_available_on_weekend = { day: DAY[day] }
       }
       // check weather present in hoildays
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+ 
+      const tomorrowStart = new Date(todayStart);
+      tomorrowStart.setDate(tomorrowStart.getDate() + 1);   
+ 
+      const holidayPresent = await this.prisma.publicHoliday.findFirst({
+        where: { date: { gte: todayStart, lt: tomorrowStart } },
+      });
 
-      const holidayPresent = await this.prisma.publicHoliday.findUnique({ where: { date: new Date().toLocaleDateString() } })
+      // const holidayPresent = await this.prisma.publicHoliday.findUnique({ where: { date: new Date().toLocaleDateString() } })
       if (holidayPresent) {
         attendance.is_available_on_holiday = {
           id: holidayPresent.id,
@@ -101,10 +110,12 @@ export class AttendanceService {
       if (!attendance) {
         return new InternalServerErrorException("Try contacting Aeologic team");
       }
+      console.log(attendanceCreated)
       return attendanceCreated;
     }
     catch (e: any) {
-      return new Error("Attendence not register try one more time or contact aeologic team")
+      console.log(e.message)
+      return new Error(e.message);
     }
   }
 
@@ -182,13 +193,16 @@ export class AttendanceService {
           });
         }
       }
+      // where.AND.push({ userId: id })
       const items = await this.prisma.attendence.findMany({
+        
         where,
         include: { user: { select: { fullName: true, email: true, phone: true } } },
         skip,
         take,
         orderBy: { createdAt: "asc" }
       })
+      console.log( items)
       const total = await this.prisma.attendence.count({ where: { id } })
       return formatPaginatedResponse<any>(items, total, page, perPage)
     }
