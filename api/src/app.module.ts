@@ -11,8 +11,6 @@ import { AppController } from "./app.controller";
 
 import { AppService } from "./app.service";
 import { WinstonLoggerService } from "./common/winston-logger/winston-logger.service";
-import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
-
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
 
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
@@ -33,6 +31,8 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { AdminModule } from './users/admin/admin.module';
 import { EmployeeModule } from './users/employee/employee.module';
 import { LeaveEntitlementsModule } from "./leaves/leave-entitlements/leave-entitlements.module";
+import { PublicHolidaysModule } from "./public-holidays/public-holidays.modules";
+import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
 
 @Module({
   imports: [
@@ -54,7 +54,8 @@ import { LeaveEntitlementsModule } from "./leaves/leave-entitlements/leave-entit
     AttendanceModule,
     AdminModule,
     EmployeeModule,
-    LeaveEntitlementsModule
+    LeaveEntitlementsModule,
+    PublicHolidaysModule
     
   ],
   controllers: [AppController],

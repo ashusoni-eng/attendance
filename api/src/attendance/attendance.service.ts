@@ -49,7 +49,7 @@ export class AttendanceService {
       //save Image
       const finalPath = await saveFile(image, userEmail) as string;
       // save attendence
-      let attendance:any = {
+      let attendance: any = {
         userId,
         location: {
           longitude: createAttendanceDto.longitude,
@@ -60,23 +60,23 @@ export class AttendanceService {
       }
       //check time 9am-8pm -> location check (Present | Late) and (Outside | inside office)
       //check time not in 9am- 8pm so (Late and Outside_office)
-      const hourOfDay=new Date().getHours();
-      if(hourOfDay>=9 && hourOfDay <=20 ){
+      const hourOfDay = new Date().getHours();
+      if (hourOfDay >= 9 && hourOfDay <= 20) {
 
-        const locationStatus:LocationStatus=getLocationStatus(parseFloat(attendance.location.longitude),parseFloat(attendance.location.latitude))
-        if(!locationStatus){
+        const locationStatus: LocationStatus = getLocationStatus(parseFloat(attendance.location.longitude), parseFloat(attendance.location.latitude))
+        if (!locationStatus) {
           throw new BadRequestException("use correct co-ordinates")
         }
-        let status:Status=Status.PRESENT;
-        if(hourOfDay>12){
-          status=Status.LATE
+        let status: Status = Status.PRESENT;
+        if (hourOfDay > 12) {
+          status = Status.LATE
         }
-        attendance.status=status;
-        attendance.locationStatus=locationStatus;
+        attendance.status = status;
+        attendance.locationStatus = locationStatus;
       }
-      else{
-        attendance.status=Status.ABSENT
-        attendance.locationStatus=LocationStatus.OUTSIDE_OFFICE
+      else {
+        attendance.status = Status.ABSENT
+        attendance.locationStatus = LocationStatus.OUTSIDE_OFFICE
       }
       //check weather the attendance lies in weekEnddays 
       const day: number = new Date().getDay()
@@ -86,6 +86,7 @@ export class AttendanceService {
       // check weather present in hoildays
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
+<<<<<<< Updated upstream
  
       const tomorrowStart = new Date(todayStart);
       tomorrowStart.setDate(tomorrowStart.getDate() + 1);   
@@ -95,6 +96,15 @@ export class AttendanceService {
       });
 
       // const holidayPresent = await this.prisma.publicHoliday.findUnique({ where: { date: new Date().toLocaleDateString() } })
+=======
+
+      const tomorrowStart = new Date(todayStart);
+      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+
+      const holidayPresent = await this.prisma.publicHoliday.findFirst({
+        where: { date: { gte: todayStart, lt: tomorrowStart } },
+      });
+>>>>>>> Stashed changes
       if (holidayPresent) {
         attendance.is_available_on_holiday = {
           id: holidayPresent.id,
@@ -103,9 +113,9 @@ export class AttendanceService {
           date: holidayPresent.date
         }
       }
-      const attendanceDbObj:AttendanceType={...attendance}
+      const attendanceDbObj: AttendanceType = { ...attendance }
       const attendanceCreated = await this.prisma.attendence.create({
-        data: { ...attendanceDbObj}
+        data: { ...attendanceDbObj }
       })
       if (!attendance) {
         return new InternalServerErrorException("Try contacting Aeologic team");
@@ -120,49 +130,43 @@ export class AttendanceService {
   }
 
   //only admin can access this function
-  async findAll(page: number, perPage: number, query: string | undefined, from: string | undefined, to: string | undefined) {
+  async findAll(page: number, perPage: number, query: string | undefined, from: Date | undefined, to: Date) {
     try {
       const { skip, take } = getPaginationOptions({ page, perPage });
-      const where: any = {}
-      if (query) {
-        where.OR = [{ user: { fullname: { contains: query } } },
-        { user: { email: { contains: query } } },
-        { user: { phone: { contains: query } } }
-        ]
-      }
-      if (from || to) {
-        if (!where.AND) {
-          where.AND = [];
-        }
-        // convert from string to date object first and check the is it possible or not if not dont push
-        if (from) {
-          where.AND.push({
-            createdAt: { gte: new Date(from) },
-          });
-        }
+      const where: any = {};
 
+      if (query) {
+        where.OR = [
+          { user: { fullName: { contains: query, mode: 'insensitive' } } },
+          { user: { email: { contains: query, mode: 'insensitive' } } },
+          { user: { phone: { contains: query } } },
+        ];
+      }
+
+      if (from || to) {
+        where.AND = where.AND || [];
+        if (from) {
+          where.AND.push({ createdAt: { gte: new Date(from) } });
+        }
         if (to) {
           const endDate = new Date(to);
           endDate.setDate(endDate.getDate() + 1);
-          where.AND.push({
-            createdAt: { lte: endDate },
-          });
+          where.AND.push({ createdAt: { lte: endDate } });
         }
       }
+
       const items = await this.prisma.attendence.findMany({
-        where: { ...where, accountType: AccountType.ADMIN },
-        include: { user: { select: { fullName: true, email: true, phone: true } } },
+        where: { ...where },
         skip,
         take,
-        orderBy: { createdAt: "asc" }
-      })
-      const total = await this.prisma.attendence.count({ where: { ...where, accountType: AccountType.ADMIN } })
-      return formatPaginatedResponse<any>(items, total, page, perPage)
+        orderBy: { createdAt: "desc" },
+      });
+      const total = await this.prisma.attendence.count({ where: { ...where } });
+      console.log(total)
+      return formatPaginatedResponse<any>(items, total, page, perPage);
+    } catch (e: any) {
+      throw new InternalServerErrorException("Failed to fetch attendance records");
     }
-    catch (e: any) {
-      new Error("Something went wrong")
-    }
-
   }
 
   async findOne(id: string, page: number, perPage: number, from: string | undefined, to: string | undefined) {

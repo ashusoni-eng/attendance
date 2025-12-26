@@ -19,15 +19,26 @@ import {
   formatPaginatedResponse,
   getPaginationOptions,
 } from "src/common/lib/pagination-helper";
-import { AccountType } from "@prisma/client";
+import { AccountType, RequestStatus } from "@prisma/client";
 import { AttendanceService } from "src/attendance/attendance.service";
+import { LeaveRequestService } from "src/leaves/leave-requests/leave-requests.service";
+import { LeaveEntitlementService } from "src/leaves/leave-entitlements/leave-entitlements.service";
+import { LeaveTypeService } from "src/leaves/leave-type/leave-type.service";
+import { PublicHolidaysService } from "src/public-holidays/public-holidays.service";
+import { UpdateLeaveRequestDto } from "src/leaves/leave-requests/dto/update-leave-requests.dto";
+import { CreateLeaveTypeDto } from "src/leaves/leave-type/create-leave-type.dto";
+import { CreateLeaveEntitlementDto } from "src/leaves/leave-entitlements/dto/create-leave-entitlements.dto";
 
 @Injectable()
 export class AdminService {
   constructor(
     private prisma: PrismaService,
     private readonly configService: ConfigService,
-    private attendanceService:AttendanceService
+    private attendanceService: AttendanceService,
+    private leaveRequestService: LeaveRequestService,
+    private leaveEntitlementService: LeaveEntitlementService,
+    private leaveTypeService: LeaveTypeService,
+    private publicHolidayService: PublicHolidaysService
   ) { }
 
   async create(createAdminDto: CreateAdminDto) {
@@ -68,10 +79,10 @@ export class AdminService {
     });
   }
 
-  
 
-  async findAll(page: number, perPage: number,query:string, from: string|undefined, to: string|undefined) {
-    this.attendanceService.findAll(page,perPage,query,from,to)
+
+  async findAll(page: number, perPage: number, query: string, from: Date | undefined, to: Date) {
+    return await this.attendanceService.findAll(page, perPage, query, from, to)
     // try {
     //   const { skip, take } = getPaginationOptions({ page, perPage });
     //   const where = { AND: [{}] };
@@ -106,10 +117,30 @@ export class AdminService {
     // });
   }
 
+  async findAllLeaveRequest(requestStatus: RequestStatus | undefined, page: number, perPage: number, from: Date | undefined, to: Date) {
+    return this.leaveRequestService.findAllByAdmin(requestStatus, page, perPage, from, to)
+  }
+
+  async updateLeaveRequest(updateLeaveRequest: UpdateLeaveRequestDto) {
+    return this.leaveRequestService.updateByAdmin(updateLeaveRequest)
+  }
+
+  async createLeaveType(createLeaveTypeDto: CreateLeaveTypeDto) {
+    return this.leaveTypeService.create(createLeaveTypeDto)
+  }
+
+  async findAllLeaveType() {
+    return this.leaveTypeService.findAll()
+  }
+  async assignLeavesToEmployee(createLeaveEntitlementDto: CreateLeaveEntitlementDto) {
+
+    return this.leaveEntitlementService.create(createLeaveEntitlementDto)
+  }
 
 
-  async findOne(id: string,page:number,perPage:number,from:string|undefined,to:string|undefined) {
-    await this.attendanceService.findById(id,page,perPage,from,to)
+
+  async findOne(id: string, page: number, perPage: number, from: string | undefined, to: string | undefined) {
+    return await this.attendanceService.findById(id, page, perPage, from, to)
     // const user = await this.prisma.user.findUnique({
     //   where: { id },
     // });
