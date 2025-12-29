@@ -1,17 +1,21 @@
 export const findNoOfWeekendsDays=(from:Date, to:Date):number=>{
-    const noOfDays=(to.getTime()-from.getTime())/(1000*24*60*60);
+    const newTo=new Date(to)
+    const newFrom= new Date(from)
+    const noOfDays=(newTo.getTime()-newFrom.getTime())/(1000*24*60*60);
     let weekendDays=0;
     for(let i=1;i<=noOfDays;i++){
-        const day=from.getDay();
+        const day=newFrom.getDay();
         if(day==0 || day==6){
             weekendDays++;
         }
-        from.setDate(from.getDate()+1);
+        newFrom.setDate(newFrom.getDate()+1);
     }
     return weekendDays;
 
 }
-export const checkSameDate=(firstDate:Date,secondDate:Date):boolean=>{
+export const checkSameDate=(first:Date,second:Date):boolean=>{
+    const firstDate=new Date(first);
+    const secondDate=new Date(second)
     if(firstDate.getFullYear() === secondDate.getFullYear() &&
     firstDate.getMonth() === secondDate.getMonth() &&
     firstDate.getDate() === secondDate.getDate()){

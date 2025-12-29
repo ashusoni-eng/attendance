@@ -18,21 +18,13 @@ export class LeaveRequestService {
                 throw new BadRequestException('Date not selected or from Date is greater than to Date');
             }
 
-            createLeaveRequest.from.setHours(0)
-            createLeaveRequest.from.setMinutes(0);
-            createLeaveRequest.from.setSeconds(0);
-            createLeaveRequest.from.setMilliseconds(0);
-
-            createLeaveRequest.to.setHours(0)
-            createLeaveRequest.to.setMinutes(0);
-            createLeaveRequest.to.setSeconds(0);
-            createLeaveRequest.to.setMilliseconds(0);
+            createLeaveRequest.from.setUTCHours(0,0,0,0)
+            createLeaveRequest.to.setUTCHours(0,0,0,0)
             // --------------------------------------------------------------
             // check apply leave date range should not lies btw already requested leaves
             // OR
             // per day one time leave apply
             // --------------------------------------------------------------
-
             const WeekendDate = findNoOfWeekendsDays(createLeaveRequest.from, createLeaveRequest.to);
             const noOfHolidays = await this.publicHolidaysService.totalHolidays(createLeaveRequest.from, createLeaveRequest.to);
             const weekDaysDuringHolidays = TfindNoOfWeekendsDays(noOfHolidays);
@@ -65,7 +57,8 @@ export class LeaveRequestService {
                         userId: createLeaveRequest.userId,
                         leave_entitlements_id: createLeaveRequest.leave_entitlements_id,
                         from: createLeaveRequest.from,
-                        to: createLeaveRequest.to
+                        to: createLeaveRequest.to,
+                        reason:createLeaveRequest.reason
                     },
                 });
 

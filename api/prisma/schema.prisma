@@ -112,8 +112,8 @@ model Leave_requests{
   leave_entitlements_id String
   request_status RequestStatus @default(PENDING)
   createdAt DateTime @default(now())
-  from Date
-  to  Date
+  from DateTime
+  to  DateTime
   reason String
   user User @relation(fields:[userId],references:[id])
   leave_entitlements Leave_entitlements @relation(fields:[leave_entitlements_id],references:[id])
