@@ -11,7 +11,9 @@ export default function AdminLeaveTypesPage() {
 
   const fetchLeaveTypes = async () => {
     const res = await leaveTypeApi.getAll();
-    setLeaveTypes(res.data);
+    // support responses like { data: LeaveType[] } or { data: { data: LeaveType[] } }
+    const data = (res as any)?.data?.data ?? (res as any)?.data ?? [];
+    setLeaveTypes(data);
   };
 
   useEffect(() => {

@@ -23,7 +23,7 @@ export default function LeaveForm() {
     const fetchLeaveTypes = async () => {
       try {
         const res = await leaveTypeApi.getAll();
-        setLeaveTypes(res.data);
+        setLeaveTypes(res.data.data);
       } catch (error) {
         console.error("Failed to fetch leave types:", error);
       }
