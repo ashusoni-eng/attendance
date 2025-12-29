@@ -6,7 +6,7 @@ import RegisterPage from "../modules/auth/pages/RegisterPage";
 import DashboardPage from "../modules/dashboard/pages/DashboardPage";
 import EmployeesPage from "../modules/employee/pages/EmployeePage";
 
-import MainLayout from "../modules/layout/Mainlayout";
+import MainLayout from "../modules/layout/MainLayout";
 import MarkAttendancePage from "../modules/attendance/pages/MarkAttendancePage";
 import MyAttendancePage from "../modules/attendance/pages/MyAttendancePage";
 import ApplyLeavePage from "../modules/leave/pages/ApplyLeavePage";
