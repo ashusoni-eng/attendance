@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AttendanceService } from 'src/attendance/attendance.service';
@@ -15,7 +15,6 @@ import { CreateLeaveRequestDto } from 'src/leaves/leave-requests/dto/create-leav
 export class EmployeeService {
   constructor(private attendanceService: AttendanceService, private userService: UsersService,
     private publicHolidayService: PublicHolidaysService,
-    private leaveTypeService: LeaveTypeService,
     private leaveEntitlementService: LeaveEntitlementService,
     private leaveRequestService: LeaveRequestService
   ) { }

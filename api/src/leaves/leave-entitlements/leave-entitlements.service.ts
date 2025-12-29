@@ -10,6 +10,7 @@ export class LeaveEntitlementService {
             if (!leaveEntitlementDto || !leaveEntitlementDto.leave_type_id) {
                 throw new BadRequestException("Leave Details Incomplete")
             }
+            //++add if leave already assigned update it or reject it 
             const data = await this.prismaService.leave_entitlements.create({ data: { ...leaveEntitlementDto,remaining_leaves:leaveEntitlementDto.total_leaves } })
             return data
         }
@@ -26,7 +27,7 @@ export class LeaveEntitlementService {
     }
     async findLeaves(userId:string){
         try{
-            if(userId){
+            if(!userId){
             throw new BadRequestException("Must pass user Id")
         }
         return await this.prismaService.leave_entitlements.findMany({

@@ -85,8 +85,8 @@ export class AdminController {
     @Query("q") query: string,
     @Query("perPage") perPage: number = 30,
     @Query("page") page: number = 1,
-    @Query('to', ParseDatePipe) to: Date = new Date(),
-    @Query('from', ParseDatePipe) from?: Date,
+    @Query('to', new ParseDatePipe()) to: Date = new Date(),
+    @Query('from', new ParseDatePipe()) from?: Date,
 
 
   ) {
@@ -128,8 +128,8 @@ export class AdminController {
   findAllLeaveRequest(
     @Query("perPage") perPage: number = 30,
     @Query("page") page: number = 1,
-    @Query('to', ParseDatePipe) to: Date = new Date(),
-    @Query('from', ParseDatePipe) from?: Date,
+    @Query('to') to: Date = new Date(),
+    @Query('from') from?: Date,
     @Query("requestStatus") requestStatus?: RequestStatus
   ) {
     return this.adminService.findAllLeaveRequest(requestStatus, page, perPage, from, to)

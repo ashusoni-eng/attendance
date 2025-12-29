@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -43,7 +43,7 @@ export class AttendanceService {
         }
       })
       if (isAttendanceMarked) {
-        return new BadRequestException("Attendance Already Marked");
+        throw new BadRequestException("Attendance Already Marked");
       }
       const userEmail = userExist.email
       //save Image
@@ -80,23 +80,12 @@ export class AttendanceService {
       }
       //check weather the attendance lies in weekEnddays 
       const day: number = new Date().getDay()
-      if (day === 0 || day === 1) {
+      if (day === 0 || day === 6) {
         attendance.is_available_on_weekend = { day: DAY[day] }
       }
       // check weather present in hoildays
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-<<<<<<< Updated upstream
- 
-      const tomorrowStart = new Date(todayStart);
-      tomorrowStart.setDate(tomorrowStart.getDate() + 1);   
- 
-      const holidayPresent = await this.prisma.publicHoliday.findFirst({
-        where: { date: { gte: todayStart, lt: tomorrowStart } },
-      });
-
-      // const holidayPresent = await this.prisma.publicHoliday.findUnique({ where: { date: new Date().toLocaleDateString() } })
-=======
 
       const tomorrowStart = new Date(todayStart);
       tomorrowStart.setDate(tomorrowStart.getDate() + 1);
@@ -104,7 +93,6 @@ export class AttendanceService {
       const holidayPresent = await this.prisma.publicHoliday.findFirst({
         where: { date: { gte: todayStart, lt: tomorrowStart } },
       });
->>>>>>> Stashed changes
       if (holidayPresent) {
         attendance.is_available_on_holiday = {
           id: holidayPresent.id,
@@ -124,8 +112,7 @@ export class AttendanceService {
       return attendanceCreated;
     }
     catch (e: any) {
-      console.log(e.message)
-      return new Error(e.message);
+      throw e;
     }
   }
 

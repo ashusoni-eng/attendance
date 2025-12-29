@@ -31,8 +31,10 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { AdminModule } from './users/admin/admin.module';
 import { EmployeeModule } from './users/employee/employee.module';
 import { LeaveEntitlementsModule } from "./leaves/leave-entitlements/leave-entitlements.module";
-import { PublicHolidaysModule } from "./public-holidays/public-holidays.modules";
+import { PublicHolidaysModule } from "./public-holidays/public-holidays.module";
 import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
+import { LeaveTypeModule } from "./leaves/leave-type/leave-type.module";
+import { LeaveRequestsModule } from "./leaves/leave-requests/leave-requests.module";
 
 @Module({
   imports: [
@@ -55,8 +57,9 @@ import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
     AdminModule,
     EmployeeModule,
     LeaveEntitlementsModule,
-    PublicHolidaysModule
-    
+    PublicHolidaysModule,
+    LeaveTypeModule,
+    LeaveRequestsModule
   ],
   controllers: [AppController],
   providers: [

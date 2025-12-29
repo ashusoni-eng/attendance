@@ -5,6 +5,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateAttendanceDto } from 'src/attendance/dto/create-attendance.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { CreateLeaveRequestDto } from 'src/leaves/leave-requests/dto/create-leave-requests.dto';
+import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id';
 
 @Controller('employee')
 export class EmployeeController {
@@ -20,11 +21,11 @@ export class EmployeeController {
     return this.employeeService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.employeeService.remove(id);
-  }
-  //--------------employee attendance specific level api------------
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.employeeService.remove(id);
+  // }
+  //--------------employee attendance specific api------------
   @Post("attendance")
   @UseInterceptors(FileInterceptor('image'))
   create(
@@ -35,7 +36,7 @@ export class EmployeeController {
 
   @Get("attendance/:id")
   findAll(
-    @Param("id") id: string,
+    @Param("id",new ParseMongoIdPipe()) id: string,
     @Query("page") page: number = 1,
     @Query("perpage") perPage: number = 31,
     @Query("from") from?: string,
@@ -69,8 +70,8 @@ export class EmployeeController {
     @Query("requestType") requestStatus: string,
     @Query("page") page: number = 1,
     @Query("from") perPage: number = 30,
-    @Query("from", ParseDatePipe) from: Date = new Date(),
-    @Query("to", ParseDatePipe) to: Date
+    @Query("from", new ParseDatePipe()) from: Date = new Date(),
+    @Query("to", new ParseDatePipe()) to: Date
   ) {
     if (!to) {
       to = new Date();
@@ -83,8 +84,8 @@ export class EmployeeController {
   async getPublicHolidays(
     @Query("page") page: number = 1,
     @Query("from") perPage: number = 30,
-    @Query("from", ParseDatePipe) from: Date = new Date(),
-    @Query("to", ParseDatePipe) to: Date
+    @Query("from", new ParseDatePipe()) from: Date = new Date(),
+    @Query("to", new ParseDatePipe()) to: Date
   ) {
     if (!to) {
       to = new Date();

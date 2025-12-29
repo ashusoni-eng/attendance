@@ -3,7 +3,7 @@ import { PrismaModule } from "src/prisma/prisma.module";
 import { LeaveTypeService } from "./leave-type.service";
 
 
-Module({
+@Module({
     imports:[],
     controllers:[],
     providers:[LeaveTypeService],

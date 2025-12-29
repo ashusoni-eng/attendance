@@ -1,6 +1,6 @@
 import { RequestStatus } from "@prisma/client"
 import { Type } from "class-transformer"
-import { IsDateString, IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsPostalCode, IsString} from "class-validator"
+import { IsDateString, IsEnum, IsISO8601, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsPostalCode, IsString} from "class-validator"
 
 export class CreateLeaveRequestDto {
 
@@ -16,11 +16,13 @@ export class CreateLeaveRequestDto {
     // @IsPositive()
     // leaveDays:number
     
-    @IsDateString()
+    @IsNotEmpty()
+    // @IsISO8601()
     @Type(()=> Date)
     from:Date
 
-    @IsDateString()
+    @IsNotEmpty()
+    // @IsISO8601()
     @Type(()=> Date)
     to:Date
 

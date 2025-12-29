@@ -35,10 +35,10 @@ export class AdminService {
     private prisma: PrismaService,
     private readonly configService: ConfigService,
     private attendanceService: AttendanceService,
-    private leaveRequestService: LeaveRequestService,
+    private publicHolidayService: PublicHolidaysService,
     private leaveEntitlementService: LeaveEntitlementService,
     private leaveTypeService: LeaveTypeService,
-    private publicHolidayService: PublicHolidaysService
+    private leaveRequestService: LeaveRequestService,
   ) { }
 
   async create(createAdminDto: CreateAdminDto) {
@@ -365,5 +365,9 @@ export class AdminService {
       }
       throw new InternalServerErrorException("Failed to update user status");
     }
+  }
+
+  async findAllHolidays(page: number, perPage: number, from: Date, to: Date) {
+    return this.publicHolidayService.findAll(page, perPage, from, to)
   }
 }
