@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 interface LoginFormInputs {
@@ -39,10 +39,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
     try {
       const response = await authApi.login(data);
-
-     
       const { user, accessToken, refreshToken } = response.data.data;
 
+      // save user
       login(accessToken, refreshToken, user);
 
       await Swal.fire({
@@ -53,7 +52,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         showConfirmButton: false,
       });
 
-      onSuccess();
+      // ✅ SAFE CALL
+      onSuccess?.();
 
     } catch (error: any) {
       const message =
@@ -73,7 +73,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   return (
     <div>
       <h2 className="text-3xl font-extrabold text-gray-900">Welcome Back!</h2>
-      <p className="mt-2 text-sm text-gray-600">Please login to your account</p>
+      <p className="mt-2 text-sm text-gray-600">
+        Please login to your account
+      </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
         {apiError && (
@@ -90,7 +92,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           <input
             {...register("email")}
             type="email"
-            className="block w-full px-3 py-2 border rounded-lg shadow-sm mt-1 placeholder-gray-400 border-gray-300"
+            className="block w-full px-3 py-2 border rounded-lg shadow-sm mt-1"
           />
           {errors.email && (
             <p className="text-sm text-red-600">{errors.email.message}</p>
@@ -105,7 +107,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           <input
             {...register("password")}
             type="password"
-            className="block w-full px-3 py-2 border rounded-lg shadow-sm mt-1 placeholder-gray-400 border-gray-300"
+            className="block w-full px-3 py-2 border rounded-lg shadow-sm mt-1"
           />
           {errors.password && (
             <p className="text-sm text-red-600">
@@ -114,7 +116,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           )}
         </div>
 
-        {/* Login Button */}
         <button
           type="submit"
           disabled={isSubmitting}
@@ -124,12 +125,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         </button>
       </form>
 
-      {/* Register Now */}
       <p className="mt-6 text-center text-sm text-gray-600">
         Don&apos;t have an account?{" "}
         <button
           onClick={() => navigate("/register")}
-          className="font-medium text-teal-600 hover:text-teal-500 cursor-pointer"
+          className="font-medium text-teal-600 hover:text-teal-500"
         >
           Register Now
         </button>

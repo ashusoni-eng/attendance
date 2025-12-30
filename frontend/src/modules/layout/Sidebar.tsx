@@ -1,54 +1,89 @@
 import { Link } from "react-router-dom";
-import { LogOut, Home, Calendar, Camera, ChevronRight } from "lucide-react";
+import { LogOut, Home, Calendar, Camera, Users  ,ChevronRight} from "lucide-react";
 import { useAuth } from "../../providers/AuthProvider";
 
 export default function Sidebar() {
   const { logout, user } = useAuth();
-  
 
   const isAdmin = user?.accountType === "ADMIN";
 
   return (
-    <div className="h-screen w-70 bg-teal-700 text-white flex flex-col justify-between fixed left-0 top-0 ">
-
-      {/* TOP MENU */}
+    <div className="h-screen w-70 bg-teal-700 text-white flex flex-col justify-between fixed left-0 top-0">
+      
+      {/* TOP */}
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-8">Attendance</h1>
+        <h1 className="text-2xl font-bold mb-8">
+          {isAdmin ? "Admin Panel" : "Attendance"}
+        </h1>
 
         <nav className="space-y-4 text-lg">
-          <Link to="/dashboard" className="flex items-center gap-3 hover:text-gray-200">
+
+          {/* DASHBOARD (common but route different) */}
+          <Link
+            to={isAdmin ? "/admin/dashboard" : "/dashboard"}
+            className="flex items-center gap-3 hover:text-gray-200"
+          >
             <Home size={20} /> Dashboard
           </Link>
 
-          <Link to="/my-attendance" className="flex  items-center gap-3 hover:text-gray-200">
-            <Camera size={20} /> My Attendance
-          </Link>
-
-          <Link to="/attendance" className="flex items-center gap-3 hover:text-gray-200">
-            <Camera size={20} /> Mark Attendance
-          </Link>
-
-          <Link to="/apply-leave" className="flex items-center gap-3 hover:text-gray-200">
-            <Calendar size={20} /> Apply Leave
-          </Link>
-
-          <Link to="/my-leaves" className="flex items-center gap-3 hover:text-gray-200">
-            <Calendar size={20} /> My Leaves
-          </Link>
-
-          {/* ADMIN ONLY */}
-          {isAdmin && (
+          {/* ================= ADMIN MENU ================= */}
+          {isAdmin ? (
             <>
-              <Link to="/employee" className="flex items-center gap-3 hover:text-gray-200">
-                <Camera size={20} /> Employees
+            <Link to="/admin/public-holidays"
+               className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Users size={20} />Public Holidays</Link>
+
+              <Link
+                to="/employee"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Users size={20} /> Employees
               </Link>
 
-              <Link to="/admin/leave-types" className="flex items-center gap-3 hover:text-gray-200">
+              <Link
+                to="/admin/leave-types"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
                 <Calendar size={20} /> Leave Types
               </Link>
 
-              <Link to="/admin/leave-entitlements" className="flex items-center gap-3 hover:text-gray-200">
+              <Link
+                to="/admin/leave-entitlements"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
                 <Calendar size={20} /> Leave Entitlements
+              </Link>
+            </>
+          ) : (
+            <>
+              {/* ================= USER MENU ================= */}
+              <Link
+                to="/my-attendance"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Camera size={20} /> My Attendance
+              </Link>
+
+              <Link
+                to="/attendance"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Camera size={20} /> Mark Attendance
+              </Link>
+
+              <Link
+                to="/apply-leave"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Calendar size={20} /> Apply Leave
+              </Link>
+
+              <Link
+                to="/my-leaves"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Calendar size={20} /> My Leaves
               </Link>
             </>
           )}

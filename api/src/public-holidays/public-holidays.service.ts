@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { getPaginationOptions } from "src/common/lib/pagination-helper";
+import { formatPaginatedResponse, getPaginationOptions } from "src/common/lib/pagination-helper";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -40,12 +40,14 @@ export class PublicHolidaysService {
                 }
                 where.AND.push({date:{lte:to}})
             }
-            await this.prismaService.publicHoliday.findMany({
+            const result= await this.prismaService.publicHoliday.findMany({
                 where,
                 take,
                 skip,
                 orderBy:{createdAt:"asc"}
             })
+            const total=await this.prismaService.publicHoliday.count({where})
+            return formatPaginatedResponse(result,total,page,perPage)
         }
         catch(e:any){
             throw new Error(e.message)

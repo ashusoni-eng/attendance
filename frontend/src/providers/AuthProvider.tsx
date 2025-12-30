@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { profileApi } from "../modules/user/api/user.api";
 
 interface User {
-  photo: string | undefined;
+  photo?: string;
   id: string;
   email: string;
   fullName: string;
@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
+  loading: boolean;
   login: (token: string, refreshToken: string, user: User) => void;
   logout: () => void;
 }
@@ -35,6 +36,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return stored ? JSON.parse(stored) : null;
   });
 
+  const [loading, setLoading] = useState(true);
+
   const isAuthenticated = !!accessToken;
 
   const login = (token: string, refreshToken: string, user: User) => {
@@ -53,30 +56,42 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     window.location.href = "/";
   };
 
-  // 🔕 Optional backend sync — SAFE
+  // 🔁 Restore user session safely
   useEffect(() => {
-    if (!accessToken) return;
+    const initAuth = async () => {
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
 
-    const syncProfile = async () => {
       try {
         const res = await profileApi();
 
-        // ✅ only update if fullName exists
         if (res?.data?.fullName) {
           setUser(res.data);
           localStorage.setItem("user", JSON.stringify(res.data));
         }
       } catch {
-        // ❌ DO NOTHING — keep local user
+        // token invalid → logout
+        logout();
+      } finally {
+        setLoading(false);
       }
     };
 
-    syncProfile();
+    initAuth();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, isAuthenticated, login, logout }}
+      value={{
+        user,
+        accessToken,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
