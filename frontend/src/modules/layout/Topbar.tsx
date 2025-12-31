@@ -14,6 +14,7 @@ const pathTitleMap: Record<string, string> = {
   '/my-leaves': "My Leaves",
   '/admin/leave-types': "Leave Types",
   '/admin/leave-entitlements': "Leave Entitlements",
+  '/admin/public-holidays': "Public Holidays",
 };
 
 export default function Topbar() {

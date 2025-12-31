@@ -9,12 +9,19 @@ export default function LeaveBalanceCards() {
   useEffect(() => {
     const fetchBalances = async () => {
       try {
-        const res = await leaveEntitlementApi.getMyEntitlements();
+        const userId = localStorage.getItem("userId") ?? "";
+        if (!userId) {
+          setBalances([]);
+          return;
+        }
+        const res = await leaveEntitlementApi.getMyEntitlements(userId);
+        console.log("test",res)
         setBalances(res.data);
       } finally {
         setLoading(false);
       }
     };
+
 
     fetchBalances();
   }, []);

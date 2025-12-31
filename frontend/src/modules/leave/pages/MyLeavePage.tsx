@@ -11,7 +11,7 @@ export default function MyLeavesPage() {
 
   const fetchLeaves = async () => {
     const res = await leaveApi.getMyLeaves(status);
-    setLeaves(res.data);
+    setLeaves(res.data.data);
   };
 
   useEffect(() => {

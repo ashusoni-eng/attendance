@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { user as User } from "../types/employee.types";
 
 interface Props {
@@ -5,6 +6,12 @@ interface Props {
 }
 
 export default function EmployeeTable({ data }: Props) {
+  const navigate = useNavigate();
+
+  const handleRowClick = (id: string) => {
+    navigate(`/employee/${id}/attendance`);
+  };
+
   return (
     <div className="overflow-x-auto rounded-lg shadow-md bg-white">
       <table className="w-full border-collapse">
@@ -47,7 +54,8 @@ export default function EmployeeTable({ data }: Props) {
             data.map((emp, index) => (
               <tr
                 key={emp.id}
-                className="hover:bg-gray-50 transition-colors"
+                onClick={() => handleRowClick(emp.id)}
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 {/* Sr No */}
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
