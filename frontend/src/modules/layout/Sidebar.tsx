@@ -71,6 +71,12 @@ export default function Sidebar() {
               >
                 <Camera size={20} /> Mark Attendance
               </Link>
+               <Link
+                to="/leave-balance"
+                className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Calendar size={20} />Leave Balance
+              </Link>
 
               <Link
                 to="/apply-leave"

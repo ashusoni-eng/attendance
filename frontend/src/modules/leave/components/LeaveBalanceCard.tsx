@@ -14,7 +14,7 @@ export default function LeaveBalanceCards() {
           setBalances([]);
           return;
         }
-        const res = await leaveEntitlementApi.getMyEntitlements(userId);
+        const res = await leaveEntitlementApi.getByUserId(userId);
         console.log("test",res)
         setBalances(res.data);
       } finally {

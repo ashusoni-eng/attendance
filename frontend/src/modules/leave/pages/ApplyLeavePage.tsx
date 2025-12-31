@@ -1,4 +1,4 @@
-import LeaveBalanceCards from "../components/LeaveBalanceCards";
+import LeaveBalanceCards from "../components/LeaveBalanceCard";
 import LeaveForm from "../components/LeaveForm";
 
 export default function ApplyLeavePage() {

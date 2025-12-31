@@ -19,10 +19,14 @@ import PublicHolidayPage from "../modules/public-holidays/pages/PublicHolidaysPa
 import MainLayout from "../modules/layout/MainLayout";
 import AdminRoute from "./AdminRoutes";
 import UserRoute from "./UserRoutes";
+import LeaveBalancePage from "../modules/leave/pages/LeaveBalancePage";
+import ProtectedRoute from "./ProtectedRoutes";
 
 export default function AppRoutes() {
   return (
+   
     <Routes>
+      
       {/* PUBLIC ROUTES */}
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -36,6 +40,11 @@ export default function AppRoutes() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/apply-leave" element={<ApplyLeavePage />} />
           <Route path="/my-leaves" element={<MyLeavesPage />} />
+          <Route
+  path="/leave-balance"
+  element={<LeaveBalancePage />}
+/>
+
         </Route>
       </Route>
 
