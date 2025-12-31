@@ -31,7 +31,9 @@ export default function LeaveTypePage() {
         </button>
       </div>
 
-      <LeaveTypeTable data={types} />
+      <LeaveTypeTable data={types} onEdit={function (leaveType: LeaveType): void {
+        throw new Error("Function not implemented.");
+      } } />
 
       {showModal && (
         <AddLeaveTypeModal

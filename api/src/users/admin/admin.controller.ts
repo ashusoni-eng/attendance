@@ -186,7 +186,19 @@ export class AdminController {
   // removeUser(@Param("id") id: string) {
   //   return this.adminService.remove(id);
   // }
-
+@Get("holidays")
+  async getPublicHolidays(
+    @Query("page") page: number = 1,
+    @Query("from") perPage: number = 30,
+    @Query("from", ) from: Date = new Date(),
+    @Query("to", ) to: Date
+  ) {
+    if (!to) {
+      to = new Date();
+      to.setMonth(from.getMonth() + 1);
+    }
+    return this.adminService.findAllHolidays(page, perPage, from, to)
+  }
 
 
 

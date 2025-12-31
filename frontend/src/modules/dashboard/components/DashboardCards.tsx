@@ -165,19 +165,19 @@ export default function DashboardCards() {
                 </div>
                 <div>
                   <h3 className="text-purple-100 text-sm font-medium">Next Holiday</h3>
-                  <p className="text-2xl font-bold">Christmas Day</p>
+                  <p className="text-2xl font-bold">Happy New Year</p>
                 </div>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mt-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-3xl font-bold">Dec 25</p>
-                    <p className="text-purple-200 text-sm">Monday, 2023</p>
+                    <p className="text-3xl font-bold">JAN 1</p>
+                    <p className="text-purple-200 text-sm">thursday, 2026</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-4xl mb-1">🎄</p>
-                    <p className="text-sm font-medium">In 15 days</p>
+                    <p className="text-4xl mb-1">🎀🎉</p>
+                    <p className="text-sm font-medium">In 2 days</p>
                   </div>
                 </div>
               </div>

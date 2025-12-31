@@ -8,6 +8,7 @@ import { useAuth } from "../../../providers/AuthProvider";
 interface Props {
   data: Attendance[];
   isLoading?: boolean;
+  userid?: string;  
 }
 
 export default function AttendanceTable({ data, isLoading = false }: Props) {
