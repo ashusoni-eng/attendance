@@ -21,6 +21,7 @@ import { UsersService } from "../users.service";
 import { UpdateLeaveRequestDto } from "src/leaves/leave-requests/dto/update-leave-requests.dto";
 import { CreateLeaveTypeDto } from "src/leaves/leave-type/create-leave-type.dto";
 import { CreateLeaveEntitlementDto } from "src/leaves/leave-entitlements/dto/create-leave-entitlements.dto";
+import { CreatePublicHolidaysDto } from "src/public-holidays/dto/create-public-holidays.dto";
 
 
 @Controller("admin")
@@ -139,7 +140,7 @@ export class AdminController {
   @UseGuards(AccountTypesGuard)
   @AccountTypes(AccountType.ADMIN)
   updateLeaveRequest(
-    @Body() updateLeaveRequestDto:UpdateLeaveRequestDto  
+    @Body() updateLeaveRequestDto: UpdateLeaveRequestDto
   ) {
     return this.adminService.updateLeaveRequest(updateLeaveRequestDto)
   }
@@ -147,21 +148,21 @@ export class AdminController {
   @Get("leave-type")
   @UseGuards(AccountTypesGuard)
   @AccountTypes(AccountType.ADMIN)
-  findAllLeaveType(){
+  findAllLeaveType() {
     return this.adminService.findAllLeaveType();
   }
 
   @Post("leave-type")
   @UseGuards(AccountTypesGuard)
   @AccountTypes(AccountType.ADMIN)
-  createLeaveType(@Body() createLeaveTypeDto:CreateLeaveTypeDto){
+  createLeaveType(@Body() createLeaveTypeDto: CreateLeaveTypeDto) {
     return this.adminService.createLeaveType(createLeaveTypeDto);
   }
 
   @Post("leave-entitlement")
   @UseGuards(AccountTypesGuard)
   @AccountTypes(AccountType.ADMIN)
-  assignLeavesToEmployee(@Body() createLeaveEntitlementDto:CreateLeaveEntitlementDto){
+  assignLeavesToEmployee(@Body() createLeaveEntitlementDto: CreateLeaveEntitlementDto) {
     return this.adminService.assignLeavesToEmployee(createLeaveEntitlementDto);
   }
 
@@ -186,12 +187,12 @@ export class AdminController {
   // removeUser(@Param("id") id: string) {
   //   return this.adminService.remove(id);
   // }
-@Get("holidays")
+  @Get("holidays")
   async getPublicHolidays(
     @Query("page") page: number = 1,
     @Query("from") perPage: number = 30,
-    @Query("from", ) from: Date = new Date(),
-    @Query("to", ) to: Date
+    @Query("from" ) from: Date = new Date(),
+    @Query("to") to: Date
   ) {
     if (!to) {
       to = new Date();
@@ -199,8 +200,11 @@ export class AdminController {
     }
     return this.adminService.findAllHolidays(page, perPage, from, to)
   }
-
-
-
+  @Post("holidays")
+  async createPublicHolidays(
+    @Body() createPublicHolidaysDto:CreatePublicHolidaysDto
+  ){
+    return this.adminService.createPublicHolidays(createPublicHolidaysDto);
+  }
 
 }
