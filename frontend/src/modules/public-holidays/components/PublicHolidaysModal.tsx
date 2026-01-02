@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import { publicHolidaysApi } from "../api/publicHolidays.api";
 import type { PublicHoliday } from "../types/publicHolidays.types";
 
@@ -25,6 +26,15 @@ export default function PublicHolidayModal({
   }, [holiday]);
 
   const handleSubmit = async () => {
+    if (!date) {
+      Swal.fire({
+        icon: "warning",
+        title: "Date required",
+        text: "Please select a holiday date",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -34,8 +44,28 @@ export default function PublicHolidayModal({
         await publicHolidaysApi.create({ date, name });
       }
 
+      await Swal.fire({
+        icon: "success",
+        title: holiday ? "Holiday Updated" : "Holiday Created",
+        text: holiday
+          ? "Holiday updated successfully."
+          : "Holiday added successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
       onSuccess();
       onClose();
+    } catch (error: any) {
+      console.error("Holiday save error:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text:
+          error?.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -78,10 +108,14 @@ export default function PublicHolidayModal({
 
           <button
             onClick={handleSubmit}
-            disabled={loading}
-            className="bg-teal-700 text-white px-4 py-2 rounded"
+            disabled={loading || !date}
+            className="bg-teal-700 text-white px-4 py-2 rounded disabled:opacity-50"
           >
-            {holiday ? "Update" : "Create"}
+            {loading
+              ? "Saving..."
+              : holiday
+              ? "Update"
+              : "Create"}
           </button>
         </div>
       </div>

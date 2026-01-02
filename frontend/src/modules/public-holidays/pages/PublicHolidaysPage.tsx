@@ -4,8 +4,12 @@ import type { PublicHoliday } from "../types/publicHolidays.types";
 import PublicHolidayTable from "../components/PublicHolidaysTable";
 import PublicHolidayModal from "../components/PublicHolidaysModal";
 import Swal from "sweetalert2";
+import { useAuth } from "../../../providers/AuthProvider";
 
 export default function PublicHolidayPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.accountType === "ADMIN";
+
   const [holidays, setHolidays] = useState<PublicHoliday[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -20,10 +24,7 @@ export default function PublicHolidayPage() {
         perPage: 20,
       });
 
-      const data =
-        res.data.data.items ||[];
-
-      setHolidays(data);
+      setHolidays(res.data?.data?.items || []);
     } catch (err) {
       console.error("Failed to load holidays", err);
     } finally {
@@ -36,6 +37,8 @@ export default function PublicHolidayPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
+    if (!isAdmin) return;
+
     const confirm = await Swal.fire({
       title: "Delete holiday?",
       text: "This action cannot be undone",
@@ -56,15 +59,18 @@ export default function PublicHolidayPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Public Holidays</h1>
 
-        <button
-          onClick={() => {
-            setSelectedHoliday(null);
-            setOpenModal(true);
-          }}
-          className="bg-teal-700 text-white px-4 py-2 rounded"
-        >
-          + Add Holiday
-        </button>
+        {/* ✅ Only ADMIN sees Add button */}
+        {isAdmin && (
+          <button
+            onClick={() => {
+              setSelectedHoliday(null);
+              setOpenModal(true);
+            }}
+            className="bg-teal-700 text-white px-4 py-2 rounded"
+          >
+            + Add Holiday
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -72,15 +78,20 @@ export default function PublicHolidayPage() {
       ) : (
         <PublicHolidayTable
           data={holidays}
-          onEdit={(h) => {
-            setSelectedHoliday(h);
-            setOpenModal(true);
-          }}
-          onDelete={handleDelete}
+          onEdit={
+            isAdmin
+              ? (holiday) => {
+                  setSelectedHoliday(holiday);
+                  setOpenModal(true);
+                }
+              : undefined
+          }
+          onDelete={isAdmin ? handleDelete : undefined}
         />
       )}
 
-      {openModal && (
+      {/* ✅ Modal only available to ADMIN */}
+      {isAdmin && openModal && (
         <PublicHolidayModal
           holiday={selectedHoliday}
           onClose={() => setOpenModal(false)}

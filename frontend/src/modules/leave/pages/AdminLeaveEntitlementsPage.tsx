@@ -1,51 +1,28 @@
 import { useEffect, useState } from "react";
-import { leaveEntitlementApi } from "../api/leaveEntitlement.api";
 import { employeeApi } from "../../employee/api/employee.api";
-import type { LeaveEntitlement } from "../types/leaveEntitlement.types";
 import EntitlementTable from "../components/EntitilementTable";
 import AssignLeaveModal from "../components/AssignLeaveModal";
 
 export default function AdminLeaveEntitlementsPage() {
-  const [entitlements, setEntitlements] = useState<LeaveEntitlement[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
+  // 🔹 Fetch ONLY users
+  const fetchUsers = async () => {
     try {
       setLoading(true);
+      const res = await employeeApi.getAll();
 
-      const [entitlementRes, usersRes] = await Promise.all([
-        leaveEntitlementApi.getAll(),
-        employeeApi.getAll(),
-      ]);
-
-      // ✅ Extract entitlement array safely
-      const rawEntitlements =
-        entitlementRes?.data?.items || entitlementRes?.items || [];
-
-      const formatted: LeaveEntitlement[] = rawEntitlements.map((e: any) => ({
-        id: e.id,
-        userId: e.userId,
-        userName: e.user?.fullName || "—",
-        leaveTypeId: e.leaveTypeId,
-        leaveTypeName: e.leaveType?.name || "—",
-        total_leaves: e.totalLeaves ?? e.total_leaves ?? 0,
-      }));
-    
-
-      setEntitlements(formatted);
-
-      // ✅ Extract users
       const userList =
-        usersRes?.data?.data?.items ||
-        usersRes?.data?.items ||
+        res?.data?.data?.items ||
+        res?.data?.items ||
         [];
 
       setUsers(userList);
-    } catch (error) {
-      console.error("Failed to load entitlements", error);
-      setEntitlements([]);
+    } catch (err) {
+      console.error("Failed to fetch users", err);
       setUsers([]);
     } finally {
       setLoading(false);
@@ -53,7 +30,7 @@ export default function AdminLeaveEntitlementsPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchUsers();
   }, []);
 
   return (
@@ -70,19 +47,67 @@ export default function AdminLeaveEntitlementsPage() {
         </button>
       </div>
 
-      {/* TABLE */}
-      {loading ? (
-        <p className="text-gray-500">Loading entitlements...</p>
-      ) : (
-        <EntitlementTable data={entitlements} />
+      {/* USERS TABLE */}
+      {!selectedUser && (
+        <>
+          {loading ? (
+            <p className="text-gray-500">Loading users...</p>
+          ) : (
+            <table className="w-full border">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border p-2">Name</th>
+                  <th className="border p-2">Email</th>
+                  <th className="border p-2">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {users.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="text-center p-4">
+                      No users found
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.id}>
+                      <td className="border p-2">{user.fullName || user.name}</td>
+                      <td className="border p-2">{user.email}</td>
+                      <td className="border p-2">
+                        <button
+                          className="text-blue-600 underline"
+                          onClick={() => setSelectedUser(user)}
+                        >
+                          View Entitlements
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+        </>
       )}
 
-      {/* MODAL */}
-       {showModal && (
+      {/* ENTITLEMENT TABLE */}
+      {selectedUser && (
+        <EntitlementTable
+          user={selectedUser}
+          onBack={() => setSelectedUser(null)}
+        />
+      )}
+
+      {/* ASSIGN MODAL */}
+      {showModal && (
         <AssignLeaveModal
-          {...({ users } as any)}
+          users={users}
           onClose={() => setShowModal(false)}
-          onSuccess={fetchData}
+          onSuccess={() => {
+            setShowModal(false);
+            // refresh list if needed
+          }}
         />
       )}
     </div>

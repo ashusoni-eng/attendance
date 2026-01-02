@@ -17,40 +17,49 @@ import AdminLeaveEntitlementsPage from "../modules/leave/pages/AdminLeaveEntitle
 import PublicHolidayPage from "../modules/public-holidays/pages/PublicHolidaysPage";
 
 import MainLayout from "../modules/layout/MainLayout";
+import LeaveBalancePage from "../modules/leave/pages/LeaveBalancePage";
+import AdminLeaveApproovalPage from "../modules/leave/pages/AdminLeaveApproovalPage";
+
+import ProtectedRoute from "./ProtectedRoutes";
 import AdminRoute from "./AdminRoutes";
 import UserRoute from "./UserRoutes";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* PUBLIC ROUTES */}
+      {/* PUBLIC */}
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* USER ROUTES */}
-      <Route element={<UserRoute />}>
-        <Route element={<MainLayout />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/attendance" element={<MarkAttendancePage />} />
-          <Route path="/my-attendance" element={<AttendancePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/apply-leave" element={<ApplyLeavePage />} />
-          <Route path="/my-leaves" element={<MyLeavesPage />} />
+      {/* USER AREA */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<UserRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/attendance" element={<MarkAttendancePage />} />
+            <Route path="/my-attendance" element={<AttendancePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/apply-leave" element={<ApplyLeavePage />} />
+            <Route path="/my-leaves" element={<MyLeavesPage />} />
+            <Route path="/public-holidays" element={<PublicHolidayPage />} />
+            <Route path="/leave-balance" element={<LeaveBalancePage />} />
+          </Route>
         </Route>
       </Route>
 
-      {/* ADMIN ROUTES */}
-      <Route element={<AdminRoute   />}>
-        <Route element={<MainLayout />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/employee" element={<EmployeesPage />} />
-          <Route path="/employee/:id/attendance" element={<AttendancePage />} />
-          <Route path="/admin/public-holidays" element={<PublicHolidayPage />} />
-          <Route path="/admin/leave-types" element={<AdminLeaveTypesPage />} />
-          <Route
-            path="/admin/leave-entitlements"
-            element={<AdminLeaveEntitlementsPage />}
-          />
+      {/* ADMIN AREA */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<MainLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="employee" element={<EmployeesPage />} />
+            <Route path="employee/:id/attendance" element={<AttendancePage />} />
+            <Route path="public-holidays" element={<PublicHolidayPage />} />
+            <Route path="leave-types" element={<AdminLeaveTypesPage />} />
+            <Route path="leave-entitlements" element={<AdminLeaveEntitlementsPage />} />
+            <Route path="leave-requests" element={<AdminLeaveApproovalPage />} />
+          </Route>
         </Route>
       </Route>
     </Routes>
