@@ -71,32 +71,61 @@ export class LeaveRequestService {
             throw new InternalServerErrorException("Failed to create leave request. Please try again later.");
         }
     }
+
     //add user,date and request_status 
     async findAllByAdmin(request_status: RequestStatus|undefined,page:number,perPage:number, from: Date|undefined, to: Date) {
+
         try {
             const {take,skip}=getPaginationOptions({page,perPage})
-            const where: any = {}
+            const where: any = {AND:[]}
+            console.log("mic test 123")
             // if (leave_entitlements_id) {
             //     where.AND.push(leave_entitlements_id);
             // }
             if (request_status) {
-                where.AND.push(request_status);
+                where.AND.push( {request_status});
             }
             if (to) {
-                where.AND.push(to)
+                where.AND.push({createdAt:{lte:to}})
             }
             if (from) {
-                where.AND.push(from)
+                where.AND.push({from})
+
             }
-            const pendingRequest = await this.prismaService.leave_requests.findMany({
-                where,
-                orderBy: { createdAt: 'desc' }
-            })
+            console.log( "test" ,where)
+          const pendingRequest = await this.prismaService.leave_requests.findMany({
+  where,
+  orderBy: { createdAt: "desc" },
+
+  include: {
+    user: {
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+      },
+    },
+    leave_entitlements: {
+      include: {
+        leaveType: {
+          select: {
+            type: true,
+            description: true,
+          },
+        },
+      },
+    },
+  },
+});
+
             const total=await this.prismaService.leave_requests.count({where})
             
             return formatPaginatedResponse<any>(pendingRequest,total,page,perPage);
+
         }
+
         catch (e: any) {
+            console.log(e.message)
             throw new InternalServerErrorException("Try one more time or connect Aeologic support team")
         }
     }

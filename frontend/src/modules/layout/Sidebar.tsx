@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { LogOut, Home, Calendar, Camera, Users  ,ChevronRight} from "lucide-react";
+import { LogOut, Home, Calendar, Camera, Users  ,ChevronRight ,ClipboardList} from "lucide-react";
 import { useAuth } from "../../providers/AuthProvider";
 
 export default function Sidebar() {
@@ -35,7 +35,7 @@ export default function Sidebar() {
                 <Users size={20} />Public Holidays</Link>
 
               <Link
-                to="/employee"
+                to="/admin/employee"
                 className="flex items-center gap-3 hover:text-gray-200"
               >
                 <Users size={20} /> Employees
@@ -47,6 +47,9 @@ export default function Sidebar() {
               >
                 <Calendar size={20} /> Leave Types
               </Link>
+               <Link to="/admin/leave-requests" className="flex items-center gap-3 hover:text-gray-200">
+      <ClipboardList size={20} /> Leaves Approoval
+    </Link>
 
               <Link
                 to="/admin/leave-entitlements"
@@ -77,6 +80,10 @@ export default function Sidebar() {
               >
                 <Calendar size={20} />Leave Balance
               </Link>
+                 <Link to="/public-holidays"
+               className="flex items-center gap-3 hover:text-gray-200"
+              >
+                <Users size={20} />Public Holidays</Link> 
 
               <Link
                 to="/apply-leave"

@@ -71,9 +71,10 @@ export default function EntitlementTable({
           ) : (
             rows.map((row) => (
               <tr key={row.id}>
-                <td className="border p-2">
-                  {row.leave_type?.name ?? "-"}
-                </td>
+              <td className="border p-2">
+  {row.leaveType?.type || "-"}
+</td>
+
                 <td className="border p-2">{row.total_leaves ?? 0}</td>
                 <td className="border p-2">{row.used_leaves ?? 0}</td>
                 <td className="border p-2">{row.remaining_leaves ?? 0}</td>

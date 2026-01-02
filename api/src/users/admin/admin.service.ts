@@ -28,6 +28,7 @@ import { PublicHolidaysService } from "src/public-holidays/public-holidays.servi
 import { UpdateLeaveRequestDto } from "src/leaves/leave-requests/dto/update-leave-requests.dto";
 import { CreateLeaveTypeDto } from "src/leaves/leave-type/create-leave-type.dto";
 import { CreateLeaveEntitlementDto } from "src/leaves/leave-entitlements/dto/create-leave-entitlements.dto";
+import { CreatePublicHolidaysDto } from "src/public-holidays/dto/create-public-holidays.dto";
 
 @Injectable()
 export class AdminService {
@@ -369,5 +370,9 @@ export class AdminService {
 
   async findAllHolidays(page: number, perPage: number, from: Date, to: Date) {
     return this.publicHolidayService.findAll(page, perPage, from, to)
+  }
+
+  async createPublicHolidays(createPublicHolidaysDto: CreatePublicHolidaysDto){
+    return  this.publicHolidayService.createPublicHolidays(createPublicHolidaysDto);
   }
 }
