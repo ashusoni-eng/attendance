@@ -4,7 +4,6 @@ import { attendanceApi } from "../api/attendance.api";
 import { useAuth } from "../../../providers/AuthProvider";
 import AttendanceTable from "../components/AttendanceTable";
 import type { Attendance } from "../types/attendance.types";
-
 export default function AttendancePage() {
   const { user } = useAuth();
   const { id } = useParams(); // employee id (admin)
@@ -41,10 +40,13 @@ export default function AttendancePage() {
   }, [targetUserId]);
 
   return (
+
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold">
         {id ? "Employee Attendance" : "My Attendance"}
+        
       </h1>
+     
 
       {loading ? (
         <p className="text-gray-600">Loading attendance...</p>
@@ -54,6 +56,8 @@ export default function AttendancePage() {
           userid={targetUserId}   
         />
       )}
+      
     </div>
+    
   );
 }

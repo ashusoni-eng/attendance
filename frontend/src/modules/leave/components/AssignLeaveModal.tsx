@@ -12,6 +12,7 @@ interface User {
 }
 
 interface Props {
+  users:any[];
   onClose: () => void;
   onSuccess: () => void;
 }
